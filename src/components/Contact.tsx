@@ -66,81 +66,80 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-16 sm:py-20 lg:py-32 bg-gradient-to-b from-background to-secondary/30">
+    <section id="contact" className="py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto text-center mb-12 sm:mb-16">
-          <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-4">
+        <div className="max-w-3xl mx-auto text-center mb-10">
+          <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-3">
             Get In Touch
           </p>
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
             Contact Me
           </h2>
-          <div className="w-16 h-[2px] bg-primary mx-auto mb-8" />
-          <p className="text-muted-foreground text-base sm:text-lg">
+          <div className="w-16 h-[2px] bg-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">
             Have a project in mind? Let's discuss how I can help you achieve your goals.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Contact Info */}
-          <div className="space-y-6 sm:space-y-8">
+          <div className="space-y-5">
             <div>
-              <h3 className="font-display text-xl sm:text-2xl font-semibold text-foreground mb-4 sm:mb-6">
+              <h3 className="font-display text-xl font-semibold text-foreground mb-3">
                 Let's Work Together
               </h3>
-              <p className="text-muted-foreground leading-relaxed mb-6 sm:mb-8 text-base sm:text-lg">
+              <p className="text-muted-foreground leading-relaxed">
                 Whether you need assistance with academic research, content creation, or 
-                professional consulting, I'm here to help. Feel free to reach out through 
-                any of the channels below.
+                professional consulting, I'm here to help.
               </p>
             </div>
 
-            <div className="space-y-4 sm:space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20">
-                  <Mail className="w-5 h-5 text-primary" />
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 group">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20 group-hover:bg-primary transition-colors duration-300">
+                  <Mail className="w-4 h-4 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground mb-1">Email</p>
+                  <p className="font-medium text-foreground text-sm">Email</p>
                   <a 
                     href="mailto:chukwuemekasimon@yahoo.com" 
-                    className="text-muted-foreground hover:text-primary transition-colors text-sm sm:text-base break-all"
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm break-all"
                   >
                     chukwuemekasimon@yahoo.com
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20">
-                  <Phone className="w-5 h-5 text-primary" />
+              <div className="flex items-start gap-3 group">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20 group-hover:bg-primary transition-colors duration-300">
+                  <Phone className="w-4 h-4 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground mb-1">Phone</p>
+                  <p className="font-medium text-foreground text-sm">Phone</p>
                   <a 
                     href="tel:+2348082453150" 
-                    className="text-muted-foreground hover:text-primary transition-colors text-sm sm:text-base"
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm"
                   >
                     +234 808 245 3150
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20">
-                  <MapPin className="w-5 h-5 text-primary" />
+              <div className="flex items-start gap-3 group">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20 group-hover:bg-primary transition-colors duration-300">
+                  <MapPin className="w-4 h-4 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground mb-1">Location</p>
-                  <p className="text-muted-foreground text-sm sm:text-base">Nigeria</p>
+                  <p className="font-medium text-foreground text-sm">Location</p>
+                  <p className="text-muted-foreground text-sm">Nigeria</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Contact Form */}
-          <div className="bg-background/80 backdrop-blur-sm p-6 sm:p-8 rounded-lg border border-border shadow-lg">
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="bg-card p-5 sm:p-6 rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow duration-300">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">Your Name</Label>
                 <Input

@@ -66,7 +66,7 @@ const Portfolio = () => {
 
   if (loading) {
     return (
-      <section id="portfolio" className="py-20 lg:py-32 bg-secondary/30">
+      <section id="portfolio" className="py-12 sm:py-16 lg:py-20 bg-secondary/30">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin mr-2" />
@@ -78,30 +78,30 @@ const Portfolio = () => {
   }
 
   return (
-    <section id="portfolio" className="py-16 sm:py-20 lg:py-32 bg-gradient-to-b from-secondary/30 to-background">
+    <section id="portfolio" className="py-12 sm:py-16 lg:py-20 bg-secondary/30">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto text-center mb-12 sm:mb-16">
-          <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-4">
+        <div className="max-w-3xl mx-auto text-center mb-10">
+          <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-3">
             My Work
           </p>
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
             Portfolio
           </h2>
-          <div className="w-16 h-[2px] bg-primary mx-auto mb-8" />
-          <p className="text-muted-foreground text-base sm:text-lg">
+          <div className="w-16 h-[2px] bg-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">
             A selection of projects showcasing my expertise across different writing disciplines
           </p>
         </div>
 
         {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
           {categories.map((category) => (
             <Button
               key={category.value}
               variant={selectedCategory === category.value ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCategory(category.value)}
-              className="text-xs sm:text-sm"
+              className="text-xs sm:text-sm transition-all duration-200 hover:scale-105"
             >
               {category.label}
             </Button>
