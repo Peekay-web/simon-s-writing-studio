@@ -1,5 +1,6 @@
 import { Pen, Search, FileEdit, MessageSquare, Lightbulb, GraduationCap } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const services = [
   {
@@ -35,10 +36,18 @@ const services = [
 ];
 
 const Services = () => {
+  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
+  const { ref: cardsRef, isVisible: cardsVisible } = useScrollAnimation({ threshold: 0.1 });
+
   return (
     <section id="services" className="py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto text-center mb-10">
+        <div 
+          ref={headerRef}
+          className={`max-w-3xl mx-auto text-center mb-10 transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-3">
             What I Offer
           </p>
@@ -51,12 +60,14 @@ const Services = () => {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div ref={cardsRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {services.map((service, index) => (
             <Card 
               key={service.title} 
-              className="group hover:border-primary/50 hover:shadow-lg transition-all duration-300 h-full cursor-default"
-              style={{ animationDelay: `${index * 0.05}s` }}
+              className={`group hover:border-primary/50 hover:shadow-lg transition-all duration-500 h-full cursor-default ${
+                cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+              }`}
+              style={{ transitionDelay: `${index * 80}ms` }}
             >
               <CardHeader className="pb-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary transition-all duration-300">

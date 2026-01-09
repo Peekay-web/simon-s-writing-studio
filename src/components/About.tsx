@@ -1,4 +1,5 @@
 import { FileText, Award, Users, BookOpen } from "lucide-react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const skills = [
   "Microsoft Word",
@@ -19,10 +20,18 @@ const stats = [
 ];
 
 const About = () => {
+  const { ref: sectionRef, isVisible: sectionVisible } = useScrollAnimation();
+  const { ref: statsRef, isVisible: statsVisible } = useScrollAnimation({ threshold: 0.2 });
+
   return (
     <section id="about" className="py-12 sm:py-16 lg:py-20 bg-secondary/30">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto text-center mb-10">
+        <div 
+          ref={sectionRef}
+          className={`max-w-3xl mx-auto text-center mb-10 transition-all duration-700 ${
+            sectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-3">
             About Me
           </p>
@@ -34,7 +43,11 @@ const About = () => {
 
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-start">
           {/* About Text */}
-          <div className="space-y-4">
+          <div 
+            className={`space-y-4 transition-all duration-700 delay-100 ${
+              sectionVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+            }`}
+          >
             <p className="text-muted-foreground leading-relaxed">
               I am <span className="text-primary font-semibold">Hon. Chukwuemeka Samuel PK Simon</span>, 
               a dedicated Research Writer, Consultant, and Freelancer with a passion for helping 
@@ -58,10 +71,13 @@ const About = () => {
                 Core Competencies
               </h3>
               <div className="flex flex-wrap gap-2">
-                {skills.map((skill) => (
+                {skills.map((skill, index) => (
                   <span
                     key={skill}
-                    className="px-3 py-1.5 bg-background border border-primary/20 text-sm text-foreground rounded-full hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 cursor-default"
+                    className={`px-3 py-1.5 bg-background border border-primary/20 text-sm text-foreground rounded-full hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 cursor-default ${
+                      sectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                    }`}
+                    style={{ transitionDelay: `${300 + index * 50}ms` }}
                   >
                     {skill}
                   </span>
@@ -71,12 +87,14 @@ const About = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-4">
+          <div ref={statsRef} className="grid grid-cols-2 gap-4">
             {stats.map((stat, index) => (
               <div
                 key={stat.label}
-                className="bg-background border border-border hover:border-primary/40 p-4 sm:p-5 text-center rounded-lg hover:shadow-md transition-all duration-300 group cursor-default"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className={`bg-background border border-border hover:border-primary/40 p-4 sm:p-5 text-center rounded-lg hover:shadow-md transition-all duration-500 group cursor-default ${
+                  statsVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
               >
                 <stat.icon className="w-6 h-6 mx-auto mb-2 text-primary group-hover:scale-110 transition-transform duration-300" />
                 <p className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-1">

@@ -1,6 +1,7 @@
 import { Calendar, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const blogPosts = [
   {
@@ -24,57 +25,68 @@ const blogPosts = [
 ];
 
 const Blog = () => {
+  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
+  const { ref: cardsRef, isVisible: cardsVisible } = useScrollAnimation({ threshold: 0.1 });
+
   return (
-    <section id="blog" className="py-20 lg:py-32 bg-secondary/30">
-      <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4">
+    <section id="blog" className="py-12 sm:py-16 lg:py-20 bg-secondary/30">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div 
+          ref={headerRef}
+          className={`max-w-3xl mx-auto text-center mb-10 transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
+          <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-3">
             Insights & Articles
           </p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
             Blog
           </h2>
-          <div className="w-16 h-[2px] bg-foreground mx-auto mb-8" />
+          <div className="w-16 h-[2px] bg-primary mx-auto mb-4" />
           <p className="text-muted-foreground">
             Sharing knowledge and insights from my experience in professional writing
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div ref={cardsRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
           {blogPosts.map((post, index) => (
             <Card 
               key={index} 
-              className="group hover:border-foreground/50 transition-colors duration-300"
+              className={`group hover:border-primary/50 hover:shadow-lg transition-all duration-500 ${
+                cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+              }`}
+              style={{ transitionDelay: `${index * 100}ms` }}
             >
               {/* Blog Image Placeholder */}
-              <div className="h-48 bg-muted flex items-center justify-center border-b border-border">
-                <div className="text-center">
-                  <div className="w-16 h-16 mx-auto rounded-lg bg-secondary flex items-center justify-center mb-2">
-                    <span className="font-display text-2xl font-semibold">{index + 1}</span>
+              <div className="h-40 bg-muted flex items-center justify-center border-b border-border overflow-hidden">
+                <div className="text-center group-hover:scale-105 transition-transform duration-500">
+                  <div className="w-14 h-14 mx-auto rounded-lg bg-primary/10 flex items-center justify-center mb-2 border border-primary/20">
+                    <span className="font-display text-xl font-semibold text-primary">{index + 1}</span>
                   </div>
                   <p className="text-xs text-muted-foreground">Featured Image</p>
                 </div>
               </div>
-              <CardHeader>
+              <CardHeader className="pb-2">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                  <span className="uppercase tracking-wider">{post.category}</span>
+                  <span className="uppercase tracking-wider text-primary">{post.category}</span>
                   <span>•</span>
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
                     {post.date}
                   </span>
                 </div>
-                <CardTitle className="font-display text-lg leading-tight group-hover:text-muted-foreground transition-colors">
+                <CardTitle className="font-display text-base leading-tight group-hover:text-primary transition-colors duration-200">
                   {post.title}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-muted-foreground leading-relaxed mb-4">
+                <CardDescription className="text-muted-foreground leading-relaxed mb-3 text-sm">
                   {post.excerpt}
                 </CardDescription>
-                <Button variant="link" className="p-0 h-auto font-medium">
+                <Button variant="link" className="p-0 h-auto font-medium text-primary">
                   Read More
-                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" />
                 </Button>
               </CardContent>
             </Card>

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { z } from "zod";
 
 const contactSchema = z.object({
@@ -16,6 +17,9 @@ const contactSchema = z.object({
 
 const Contact = () => {
   const { toast } = useToast();
+  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
+  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation({ threshold: 0.1 });
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -65,10 +69,36 @@ const Contact = () => {
     }
   };
 
+  const contactInfo = [
+    {
+      icon: Mail,
+      label: "Email",
+      value: "chukwuemekasimon@yahoo.com",
+      href: "mailto:chukwuemekasimon@yahoo.com"
+    },
+    {
+      icon: Phone,
+      label: "Phone",
+      value: "+234 808 245 3150",
+      href: "tel:+2348082453150"
+    },
+    {
+      icon: MapPin,
+      label: "Location",
+      value: "Nigeria",
+      href: null
+    }
+  ];
+
   return (
     <section id="contact" className="py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto text-center mb-10">
+        <div 
+          ref={headerRef}
+          className={`max-w-3xl mx-auto text-center mb-10 transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-3">
             Get In Touch
           </p>
@@ -81,9 +111,13 @@ const Contact = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div ref={contentRef} className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Contact Info */}
-          <div className="space-y-5">
+          <div 
+            className={`space-y-5 transition-all duration-700 ${
+              contentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+            }`}
+          >
             <div>
               <h3 className="font-display text-xl font-semibold text-foreground mb-3">
                 Let's Work Together
@@ -95,50 +129,42 @@ const Contact = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-start gap-3 group">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20 group-hover:bg-primary transition-colors duration-300">
-                  <Mail className="w-4 h-4 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
+              {contactInfo.map((info, index) => (
+                <div 
+                  key={info.label}
+                  className={`flex items-start gap-3 group transition-all duration-500 ${
+                    contentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+                  }`}
+                  style={{ transitionDelay: `${200 + index * 100}ms` }}
+                >
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20 group-hover:bg-primary transition-colors duration-300">
+                    <info.icon className="w-4 h-4 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground text-sm">{info.label}</p>
+                    {info.href ? (
+                      <a 
+                        href={info.href}
+                        className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm break-all"
+                      >
+                        {info.value}
+                      </a>
+                    ) : (
+                      <p className="text-muted-foreground text-sm">{info.value}</p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-foreground text-sm">Email</p>
-                  <a 
-                    href="mailto:chukwuemekasimon@yahoo.com" 
-                    className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm break-all"
-                  >
-                    chukwuemekasimon@yahoo.com
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 group">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20 group-hover:bg-primary transition-colors duration-300">
-                  <Phone className="w-4 h-4 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground text-sm">Phone</p>
-                  <a 
-                    href="tel:+2348082453150" 
-                    className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm"
-                  >
-                    +234 808 245 3150
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 group">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20 group-hover:bg-primary transition-colors duration-300">
-                  <MapPin className="w-4 h-4 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground text-sm">Location</p>
-                  <p className="text-muted-foreground text-sm">Nigeria</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
           {/* Contact Form */}
-          <div className="bg-card p-5 sm:p-6 rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div 
+            className={`bg-card p-5 sm:p-6 rounded-lg border border-border shadow-sm hover:shadow-md transition-all duration-500 ${
+              contentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+            }`}
+            style={{ transitionDelay: '200ms' }}
+          >
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">Your Name</Label>
@@ -197,7 +223,7 @@ const Contact = () => {
               <Button 
                 type="submit" 
                 size="lg" 
-                className="w-full bg-primary hover:bg-primary/90 transition-colors" 
+                className="w-full bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-[1.02]" 
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
