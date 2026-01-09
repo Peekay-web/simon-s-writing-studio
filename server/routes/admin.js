@@ -7,6 +7,7 @@ const Portfolio = require('../models/Portfolio');
 const Testimonial = require('../models/Testimonial');
 const Analytics = require('../models/Analytics');
 const auth = require('../middleware/auth');
+const { Op } = require('sequelize');
 
 const router = express.Router();
 
@@ -47,36 +48,44 @@ const upload = multer({
 router.get('/dashboard', auth, async (req, res) => {
   try {
     // Get counts
-    const totalPortfolios = await Portfolio.countDocuments();
-    const publishedPortfolios = await Portfolio.countDocuments({ isPublished: true });
-    const pendingTestimonials = await Testimonial.countDocuments({ isApproved: false });
-    const totalTestimonials = await Testimonial.countDocuments({ isApproved: true });
+    const totalPortfolios = await Portfolio.count();
+    const publishedPortfolios = await Portfolio.count({ where: { isPublished: true } });
+    const pendingTestimonials = await Testimonial.count({ where: { isApproved: false } });
+    const totalTestimonials = await Testimonial.count({ where: { isApproved: true } });
 
     // Get recent activity (last 7 days)
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    const recentViews = await Analytics.countDocuments({
-      type: 'page_view',
-      createdAt: { $gte: weekAgo }
+    const recentViews = await Analytics.count({
+      where: {
+        type: 'page_view',
+        createdAt: { [Op.gte]: weekAgo }
+      }
     });
 
-    const recentPortfolioViews = await Analytics.countDocuments({
-      type: 'portfolio_view',
-      createdAt: { $gte: weekAgo }
+    const recentPortfolioViews = await Analytics.count({
+      where: {
+        type: 'portfolio_view',
+        createdAt: { [Op.gte]: weekAgo }
+      }
     });
 
     // Get latest testimonials
-    const latestTestimonials = await Testimonial.find({ isApproved: false })
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .select('name rating review projectType createdAt');
+    const latestTestimonials = await Testimonial.findAll({
+      where: { isApproved: false },
+      order: [['createdAt', 'DESC']],
+      limit: 5,
+      attributes: ['name', 'rating', 'statement', 'projectType', 'createdAt']
+    });
 
     // Get most viewed portfolios
-    const topPortfolios = await Portfolio.find({ isPublished: true })
-      .sort({ views: -1 })
-      .limit(5)
-      .select('title views category createdAt');
+    const topPortfolios = await Portfolio.findAll({
+      where: { isPublished: true },
+      order: [['views', 'DESC']],
+      limit: 5,
+      attributes: ['title', 'views', 'category', 'createdAt']
+    });
 
     res.json({
       stats: {
@@ -103,28 +112,29 @@ router.get('/portfolio', auth, async (req, res) => {
   try {
     const { page = 1, limit = 10, category, status } = req.query;
     
-    const query = {};
+    const where = {};
     if (category && category !== 'all') {
-      query.category = category;
+      where.category = category;
     }
     if (status === 'published') {
-      query.isPublished = true;
+      where.isPublished = true;
     } else if (status === 'draft') {
-      query.isPublished = false;
+      where.isPublished = false;
     }
 
-    const portfolios = await Portfolio.find(query)
-      .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-
-    const total = await Portfolio.countDocuments(query);
+    const offset = (page - 1) * limit;
+    const { count, rows: portfolios } = await Portfolio.findAndCountAll({
+      where,
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset
+    });
 
     res.json({
       portfolios,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-      total
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+      total: count
     });
   } catch (error) {
     console.error(error);
@@ -137,7 +147,7 @@ router.get('/portfolio', auth, async (req, res) => {
 // @access  Private (Admin only)
 router.put('/profile', auth, upload.single('profileImage'), async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findByPk(req.user.id);
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -148,7 +158,12 @@ router.put('/profile', auth, upload.single('profileImage'), async (req, res) => 
     // Update email if provided
     if (email && email !== user.email) {
       // Check if email already exists
-      const existingUser = await User.findOne({ email, _id: { $ne: user._id } });
+      const existingUser = await User.findOne({ 
+        where: { 
+          email, 
+          id: { [Op.ne]: user.id } 
+        } 
+      });
       if (existingUser) {
         return res.status(400).json({ message: 'Email already in use' });
       }
@@ -173,7 +188,7 @@ router.put('/profile', auth, upload.single('profileImage'), async (req, res) => 
     res.json({
       message: 'Profile updated successfully',
       user: {
-        id: user._id,
+        id: user.id,
         email: user.email,
         profileImage: user.profileImage,
         role: user.role
@@ -200,7 +215,7 @@ router.put('/password', auth, async (req, res) => {
       return res.status(400).json({ message: 'New password must be at least 6 characters' });
     }
 
-    const user = await User.findById(req.user.id);
+    const user = await User.findByPk(req.user.id);
     
     // Verify current password
     const isMatch = await user.comparePassword(currentPassword);
@@ -232,7 +247,7 @@ router.post('/portfolio/reorder', auth, async (req, res) => {
 
     // Update order for each item
     const updatePromises = items.map(item => 
-      Portfolio.findByIdAndUpdate(item.id, { order: item.order })
+      Portfolio.update({ order: item.order }, { where: { id: item.id } })
     );
 
     await Promise.all(updatePromises);
