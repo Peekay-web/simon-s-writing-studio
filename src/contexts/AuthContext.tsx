@@ -3,6 +3,7 @@ import axios from '@/lib/axios';
 
 interface User {
   id: string;
+  name: string;
   email: string;
   role: string;
   profileImage?: string;
@@ -11,7 +12,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (password: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
 }
@@ -43,9 +44,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (password: string) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await axios.post('/api/auth/login', { password });
       const { token: newToken, user: userData } = response.data;
       
       setToken(newToken);

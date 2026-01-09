@@ -13,7 +13,7 @@ import Footer from '@/components/Footer';
 import axios from '@/lib/axios';
 
 interface Testimonial {
-  _id: string;
+  id: string;
   name: string;
   status: string;
   career: string;
@@ -280,7 +280,7 @@ const Testimonials = () => {
               <>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
                   {testimonials.map((testimonial) => (
-                    <Card key={testimonial._id} className="relative">
+                    <Card key={testimonial.id} className="relative">
                       <CardContent className="pt-8 pb-6">
                         <Quote className="w-8 h-8 text-muted-foreground/30 absolute top-6 left-6" />
                         

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 
   (import.meta.env.PROD 
-    ? 'https://simon-writing-studio-backend.onrender.com' 
+    ? 'https://simon-s-writing-studio-backend.onrender.com' 
     : 'http://localhost:5000');
 
 // Create axios instance with base configuration

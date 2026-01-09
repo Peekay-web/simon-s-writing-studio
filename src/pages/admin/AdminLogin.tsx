@@ -9,7 +9,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,10 +26,10 @@ const AdminLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
+    if (!password) {
       toast({
         title: 'Error',
-        description: 'Please fill in all fields',
+        description: 'Please enter the password',
         variant: 'destructive'
       });
       return;
@@ -38,7 +37,7 @@ const AdminLogin = () => {
 
     setLoading(true);
     try {
-      await login(email, password);
+      await login(password);
       toast({
         title: 'Success',
         description: 'Welcome to the admin dashboard!'
@@ -70,25 +69,12 @@ const AdminLogin = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="admin@simonwritingstudio.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Admin Password</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
+                  placeholder="Enter admin password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
@@ -125,14 +111,6 @@ const AdminLogin = () => {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>Default credentials:</p>
-            <p className="font-mono text-xs mt-1">
-              Email: PARAKLETOS@ADMINRG-CFKA0M4<br />
-              Password: GODABEG
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

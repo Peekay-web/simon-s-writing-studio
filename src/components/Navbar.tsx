@@ -51,12 +51,6 @@ const Navbar = () => {
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-full"></span>
               </a>
             ))}
-            <a
-              href="/admin"
-              className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-            >
-              Admin
-            </a>
             <Button size="sm" className="bg-primary hover:bg-primary/90 ml-4" asChild>
               <a href="#contact">Hire Me</a>
             </Button>
@@ -86,13 +80,6 @@ const Navbar = () => {
                   {link.label}
                 </a>
               ))}
-              <a
-                href="/admin"
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2 px-2 rounded-md hover:bg-secondary/50"
-                onClick={() => setIsOpen(false)}
-              >
-                Admin
-              </a>
               <Button size="sm" className="bg-primary hover:bg-primary/90 w-fit mt-2" asChild>
                 <a href="#contact" onClick={() => setIsOpen(false)}>Hire Me</a>
               </Button>
