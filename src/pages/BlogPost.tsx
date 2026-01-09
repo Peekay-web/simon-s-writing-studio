@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 interface BlogPost {
   _id: string;

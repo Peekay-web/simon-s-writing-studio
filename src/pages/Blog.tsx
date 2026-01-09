@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 interface BlogPost {
   _id: string;

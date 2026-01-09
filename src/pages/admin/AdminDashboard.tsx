@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import AdminLayout from '@/components/admin/AdminLayout';
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 interface DashboardStats {
   totalPortfolios: number;

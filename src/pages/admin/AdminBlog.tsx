@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/admin/AdminLayout';
 import RichTextEditor from '@/components/admin/RichTextEditor';
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 interface BlogPost {
   _id: string;
@@ -63,9 +63,7 @@ const AdminBlog = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/blog/admin/all', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      const response = await axios.get('/api/blog/admin/all');
       setPosts(response.data.blogs);
     } catch (error) {
       console.error('Error fetching blog posts:', error);
@@ -121,17 +119,13 @@ const AdminBlog = () => {
       };
 
       if (editingPost) {
-        await axios.put(`/api/blog/${editingPost._id}`, postData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await axios.put(`/api/blog/${editingPost._id}`, postData);
         toast({
           title: 'Success!',
           description: 'Blog post updated successfully'
         });
       } else {
-        await axios.post('/api/blog', postData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await axios.post('/api/blog', postData);
         toast({
           title: 'Success!',
           description: 'Blog post created successfully'
@@ -156,9 +150,7 @@ const AdminBlog = () => {
     if (!confirm('Are you sure you want to delete this blog post?')) return;
 
     try {
-      await axios.delete(`/api/blog/${postId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      await axios.delete(`/api/blog/${postId}`);
       toast({
         title: 'Success!',
         description: 'Blog post deleted successfully'

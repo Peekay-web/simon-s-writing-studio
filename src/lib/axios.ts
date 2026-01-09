@@ -1,8 +1,11 @@
 import axios from 'axios';
 
-// Configure axios base URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD 
+    ? 'https://simon-writing-studio-backend.onrender.com' 
+    : 'http://localhost:5000');
 
+// Create axios instance with base configuration
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -25,11 +28,12 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle errors
+// Add response interceptor for error handling
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Clear token and redirect to login if unauthorized
       localStorage.removeItem('token');
       window.location.href = '/admin/login';
     }
