@@ -12,6 +12,7 @@ const inMemoryStorage = {
   users: [
     {
       id: 1,
+      name: 'Hon. Chukwuemeka Samuel PK Simon',
       email: process.env.ADMIN_EMAIL || 'PARAKLETOS@ADMINRG-CFKA0M4',
       password: process.env.ADMIN_PASSWORD || 'GODABEG',
       role: 'admin'
@@ -85,7 +86,7 @@ const inMemoryStorage = {
 global.inMemoryStorage = inMemoryStorage;
 
 console.log('✅ In-memory storage initialized');
-console.log(`👤 Admin user: ${inMemoryStorage.users[0].email}`);
+console.log(`👤 Admin user: ${inMemoryStorage.users[0].name} (${inMemoryStorage.users[0].email})`);
 console.log(`📊 Sample data loaded: ${inMemoryStorage.portfolios.length} portfolios, ${inMemoryStorage.testimonials.length} testimonials`);
 
 // Security middleware
@@ -143,4 +144,15 @@ app.use('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  
+  // Keep-alive mechanism for Render free tier
+  if (process.env.NODE_ENV === 'production') {
+    const keepAlive = () => {
+      console.log('🔄 Keep-alive ping');
+    };
+    
+    // Ping every 10 minutes to prevent sleeping
+    setInterval(keepAlive, 10 * 60 * 1000);
+    console.log('⏰ Keep-alive mechanism started (10 min intervals)');
+  }
 });

@@ -8,7 +8,6 @@ const router = express.Router();
 // @desc    Admin login
 // @access  Public
 router.post('/login', [
-  body('email').isEmail().normalizeEmail(),
   body('password').isLength({ min: 6 })
 ], async (req, res) => {
   try {
@@ -17,16 +16,11 @@ router.post('/login', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password } = req.body;
+    const { password } = req.body;
 
-    // Check against in-memory storage
-    const user = global.inMemoryStorage.users.find(u => u.email === email);
+    // Check against in-memory storage (password-only login)
+    const user = global.inMemoryStorage.users.find(u => u.password === password);
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    // Simple password check (no bcrypt to avoid segfaults)
-    if (password !== user.password) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
@@ -34,6 +28,7 @@ router.post('/login', [
     const payload = {
       user: {
         id: user.id,
+        name: user.name,
         email: user.email,
         role: user.role
       }
@@ -45,6 +40,7 @@ router.post('/login', [
       token,
       user: {
         id: user.id,
+        name: user.name,
         email: user.email,
         role: user.role
       }
@@ -76,6 +72,7 @@ router.get('/me', async (req, res) => {
 
     res.json({
       id: user.id,
+      name: user.name,
       email: user.email,
       role: user.role
     });

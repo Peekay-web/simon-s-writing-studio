@@ -22,6 +22,7 @@ module.exports = async (req, res, next) => {
     // Add user to request
     req.user = {
       id: user.id,
+      name: user.name,
       email: user.email,
       role: user.role
     };
