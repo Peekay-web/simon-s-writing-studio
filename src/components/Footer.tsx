@@ -19,26 +19,26 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-br from-foreground to-foreground/90 text-background py-12 sm:py-16">
+    <footer className="bg-foreground text-background py-10 sm:py-12">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 mb-8 sm:mb-12">
+        <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <h3 className="font-display text-xl sm:text-2xl font-bold mb-4 text-primary-foreground">
+            <h3 className="font-display text-xl font-bold mb-3 text-primary-foreground">
               Hon. Chukwuemeka Samuel PK Simon
             </h3>
-            <p className="text-background/70 leading-relaxed mb-6 text-sm sm:text-base">
+            <p className="text-background/70 leading-relaxed mb-4 text-sm">
               Professional Research Writer, Consultant, and Freelancer dedicated to 
               helping you achieve your academic and professional goals.
             </p>
-            <div className="flex gap-3 sm:gap-4">
+            <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-background/30 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                  className="w-9 h-9 rounded-full border border-background/30 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300 hover:scale-110"
                   aria-label={social.label}
                 >
                   <social.icon className="w-4 h-4" />
@@ -49,18 +49,18 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-display text-base sm:text-lg font-semibold mb-4 text-primary-foreground">Contact Info</h4>
-            <ul className="space-y-2 sm:space-y-3 text-background/70 text-sm sm:text-base">
+            <h4 className="font-display text-base font-semibold mb-3 text-primary-foreground">Contact Info</h4>
+            <ul className="space-y-2 text-background/70 text-sm">
               <li>
                 <a 
                   href="mailto:chukwuemekasimon@yahoo.com" 
-                  className="hover:text-primary transition-colors break-all"
+                  className="hover:text-primary transition-colors duration-200 break-all"
                 >
                   chukwuemekasimon@yahoo.com
                 </a>
               </li>
               <li>
-                <a href="tel:+2348082453150" className="hover:text-primary transition-colors">
+                <a href="tel:+2348082453150" className="hover:text-primary transition-colors duration-200">
                   +234 808 245 3150
                 </a>
               </li>
@@ -70,8 +70,8 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-background/20 pt-6 sm:pt-8 text-center">
-          <p className="text-background/60 text-xs sm:text-sm">
+        <div className="border-t border-background/20 pt-6 text-center">
+          <p className="text-background/60 text-xs">
             © {currentYear} Hon. Chukwuemeka Samuel PK Simon. All rights reserved.
           </p>
         </div>
