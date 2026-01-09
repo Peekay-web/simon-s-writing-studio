@@ -1,6 +1,6 @@
 # Simon's Writing Studio
 
-A full-stack professional portfolio website for Hon. Chukwuemeka Samuel Simon - Research Writer, Consultant, and Freelancer with complete admin dashboard and content management system.
+A full-stack professional portfolio website for Hon. Chukwuemeka Samuel PK Simon - Research Writer, Consultant, and Freelancer with complete admin dashboard and content management system.
 
 ## 🌟 Features
 
@@ -191,7 +191,7 @@ simon-s-writing-studio/
 
 ## 📄 License
 
-© 2026 Hon. Chukwuemeka Samuel Simon. All rights reserved.
+© 2026 Hon. Chukwuemeka Samuel PK Simon. All rights reserved.
 
 ---
 

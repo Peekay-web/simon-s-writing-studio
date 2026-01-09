@@ -36,7 +36,7 @@ const About = () => {
           {/* About Text */}
           <div className="space-y-6">
             <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
-              I am <span className="text-primary font-semibold">Hon. Chukwuemeka Samuel Simon</span>, 
+              I am <span className="text-primary font-semibold">Hon. Chukwuemeka Samuel PK Simon</span>, 
               a dedicated Research Writer, Consultant, and Freelancer with a passion for helping 
               individuals and organizations achieve their academic and professional goals through 
               the power of well-crafted words.

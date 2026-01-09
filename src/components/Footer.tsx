@@ -25,7 +25,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <h3 className="font-display text-xl sm:text-2xl font-bold mb-4 text-primary-foreground">
-              Hon. Chukwuemeka Samuel Simon
+              Hon. Chukwuemeka Samuel PK Simon
             </h3>
             <p className="text-background/70 leading-relaxed mb-6 text-sm sm:text-base">
               Professional Research Writer, Consultant, and Freelancer dedicated to 
@@ -72,7 +72,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="border-t border-background/20 pt-6 sm:pt-8 text-center">
           <p className="text-background/60 text-xs sm:text-sm">
-            © {currentYear} Hon. Chukwuemeka Samuel Simon. All rights reserved.
+            © {currentYear} Hon. Chukwuemeka Samuel PK Simon. All rights reserved.
           </p>
         </div>
       </div>
