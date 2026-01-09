@@ -2,13 +2,6 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const Testimonial = require('../models/Testimonial');
 const auth = require('../middleware/auth');
-
-const router = express.Router();
-
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const Testimonial = require('../models/Testimonial');
-const auth = require('../middleware/auth');
 const { Op } = require('sequelize');
 
 const router = express.Router();
