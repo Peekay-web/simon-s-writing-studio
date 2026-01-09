@@ -1,5 +1,6 @@
 import { Quote } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const testimonials = [
   {
@@ -25,39 +26,53 @@ const testimonials = [
 ];
 
 const Testimonials = () => {
+  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
+  const { ref: cardsRef, isVisible: cardsVisible } = useScrollAnimation({ threshold: 0.1 });
+
   return (
-    <section id="testimonials" className="py-20 lg:py-32">
-      <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4">
+    <section id="testimonials" className="py-12 sm:py-16 lg:py-20">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div 
+          ref={headerRef}
+          className={`max-w-3xl mx-auto text-center mb-10 transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
+          <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-3">
             Client Feedback
           </p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
             Testimonials
           </h2>
-          <div className="w-16 h-[2px] bg-foreground mx-auto mb-8" />
+          <div className="w-16 h-[2px] bg-primary mx-auto mb-4" />
           <p className="text-muted-foreground">
             What my clients say about working with me
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        <div ref={cardsRef} className="grid md:grid-cols-2 gap-4 max-w-5xl mx-auto">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="relative">
-              <CardContent className="pt-8 pb-6">
-                <Quote className="w-10 h-10 text-muted-foreground/30 absolute top-6 left-6" />
-                <p className="text-muted-foreground leading-relaxed mb-6 pl-8">
+            <Card 
+              key={index} 
+              className={`relative group hover:border-primary/40 hover:shadow-md transition-all duration-500 ${
+                cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+              }`}
+              style={{ transitionDelay: `${index * 100}ms` }}
+            >
+              <CardContent className="pt-6 pb-5">
+                <Quote className="w-8 h-8 text-primary/20 absolute top-5 left-5 group-hover:text-primary/40 transition-colors duration-300" />
+                <p className="text-muted-foreground leading-relaxed mb-5 pl-6 text-sm">
                   "{testimonial.quote}"
                 </p>
-                <div className="flex items-center gap-4 pl-8">
-                  <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
-                    <span className="font-display font-semibold text-foreground">
+                <div className="flex items-center gap-3 pl-6">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:border-primary transition-all duration-300">
+                    <span className="font-display font-semibold text-primary group-hover:text-primary-foreground transition-colors duration-300">
                       {testimonial.name.charAt(0)}
                     </span>
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.title}</p>
+                    <p className="font-medium text-foreground text-sm">{testimonial.name}</p>
+                    <p className="text-xs text-muted-foreground">{testimonial.title}</p>
                   </div>
                 </div>
               </CardContent>
