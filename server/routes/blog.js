@@ -1,9 +1,11 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const Blog = require('../models/Blog');
+const User = require('../models/User');
 const auth = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
+const { Op } = require('sequelize');
 
 const router = express.Router();
 
@@ -29,15 +31,6 @@ const upload = multer({
     }
   }
 });
-
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const Blog = require('../models/Blog');
-const User = require('../models/User');
-const auth = require('../middleware/auth');
-const multer = require('multer');
-const path = require('path');
-const { Op } = require('sequelize');
 
 const router = express.Router();
 
