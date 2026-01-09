@@ -6,8 +6,8 @@ const navLinks = [
   { href: "#about", label: "About" },
   { href: "#services", label: "Services" },
   { href: "#portfolio", label: "Portfolio" },
-  { href: "#testimonials", label: "Testimonials" },
-  { href: "#blog", label: "Blog" },
+  { href: "/testimonials", label: "Testimonials" },
+  { href: "/blog", label: "Blog" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -18,8 +18,25 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          <a href="#" className="font-display text-xl font-semibold text-primary hover:text-primary/80 transition-colors">
-            CES
+          <a href="#" className="font-display text-xl font-semibold text-primary hover:text-primary/80 transition-colors flex items-center">
+            <img 
+              src="/favicon.svg" 
+              alt="PK Koncepts Logo" 
+              className="w-8 h-8 mr-2"
+              onError={(e) => {
+                // Fallback to text if logo fails to load
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  const span = document.createElement('span');
+                  span.textContent = 'CES';
+                  span.className = 'font-display text-xl font-semibold';
+                  parent.appendChild(span);
+                }
+              }}
+            />
+            <span className="hidden sm:inline">PK Koncepts</span>
           </a>
 
           {/* Desktop Navigation */}
@@ -34,6 +51,12 @@ const Navbar = () => {
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-200 group-hover:w-full"></span>
               </a>
             ))}
+            <a
+              href="/admin"
+              className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+            >
+              Admin
+            </a>
             <Button size="sm" className="bg-primary hover:bg-primary/90 ml-4" asChild>
               <a href="#contact">Hire Me</a>
             </Button>
@@ -63,6 +86,13 @@ const Navbar = () => {
                   {link.label}
                 </a>
               ))}
+              <a
+                href="/admin"
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2 px-2 rounded-md hover:bg-secondary/50"
+                onClick={() => setIsOpen(false)}
+              >
+                Admin
+              </a>
               <Button size="sm" className="bg-primary hover:bg-primary/90 w-fit mt-2" asChild>
                 <a href="#contact" onClick={() => setIsOpen(false)}>Hire Me</a>
               </Button>
