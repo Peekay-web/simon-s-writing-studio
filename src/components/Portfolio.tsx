@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import FileViewer from "./FileViewer";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 interface PortfolioItem {
@@ -25,7 +24,7 @@ const Portfolio = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPortfolio, setSelectedPortfolio] = useState<PortfolioItem | null>(null);
-  
+
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: filterRef, isVisible: filterVisible } = useScrollAnimation({ threshold: 0.2 });
   const { ref: gridRef, isVisible: gridVisible } = useScrollAnimation({ threshold: 0.1 });
@@ -85,11 +84,10 @@ const Portfolio = () => {
   return (
     <section id="portfolio" className="py-12 sm:py-16 lg:py-20 bg-secondary/30">
       <div className="container mx-auto px-4 sm:px-6">
-        <div 
+        <div
           ref={headerRef}
-          className={`max-w-3xl mx-auto text-center mb-10 transition-all duration-700 ${
-            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
+          className={`max-w-3xl mx-auto text-center mb-10 transition-all duration-700 ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
         >
           <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-3">
             My Work
@@ -104,11 +102,10 @@ const Portfolio = () => {
         </div>
 
         {/* Category Filter */}
-        <div 
+        <div
           ref={filterRef}
-          className={`flex flex-wrap justify-center gap-2 mb-6 transition-all duration-700 delay-100 ${
-            filterVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
+          className={`flex flex-wrap justify-center gap-2 mb-6 transition-all duration-700 delay-100 ${filterVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
         >
           {categories.map((category, index) => (
             <Button
@@ -132,18 +129,17 @@ const Portfolio = () => {
         ) : (
           <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {portfolios.map((project, index) => (
-              <Card 
-                key={project._id} 
-                className={`group overflow-hidden hover:border-primary/50 hover:shadow-lg transition-all duration-500 ${
-                  gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-                }`}
+              <Card
+                key={project._id}
+                className={`group overflow-hidden hover:border-primary/50 hover:shadow-lg transition-all duration-500 ${gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                  }`}
                 style={{ transitionDelay: `${index * 80}ms` }}
               >
                 {/* Project Thumbnail */}
                 <div className="h-48 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border-b border-border relative overflow-hidden">
                   {project.customThumbnail || project.thumbnail ? (
-                    <img 
-                      src={project.customThumbnail || project.thumbnail} 
+                    <img
+                      src={project.customThumbnail || project.thumbnail}
                       alt={project.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -176,7 +172,7 @@ const Portfolio = () => {
                   <CardDescription className="text-muted-foreground leading-relaxed mb-4 text-sm">
                     {project.description}
                   </CardDescription>
-                  
+
                   {/* Tags */}
                   {project.tags && project.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-4">
@@ -195,9 +191,9 @@ const Portfolio = () => {
 
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                         onClick={() => setSelectedPortfolio(project)}
                       >
@@ -211,12 +207,20 @@ const Portfolio = () => {
                           {selectedPortfolio?.title}
                         </DialogTitle>
                       </DialogHeader>
-                      {selectedPortfolio && selectedPortfolio.hasFile && (
-                        <FileViewer 
-                          portfolioId={selectedPortfolio._id}
-                          fileName={selectedPortfolio.title}
-                        />
-                      )}
+                      <div className="p-6">
+                        <p className="text-muted-foreground mb-4">
+                          {selectedPortfolio?.description}
+                        </p>
+                        {selectedPortfolio?.tags && selectedPortfolio.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {selectedPortfolio.tags.map((tag, idx) => (
+                              <Badge key={idx} variant="secondary">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </DialogContent>
                   </Dialog>
                 </CardContent>
