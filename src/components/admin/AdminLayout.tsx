@@ -89,8 +89,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 key={item.path}
                 to={item.path}
                 className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${isActive
-                    ? 'bg-primary/10 text-primary border-r-2 border-primary'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-primary/10 text-primary border-r-2 border-primary'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 onClick={() => setSidebarOpen(false)}
               >
@@ -148,7 +148,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="pt-2 px-6 pb-6">
           {children}
         </main>
       </div>
