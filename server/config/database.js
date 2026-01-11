@@ -85,4 +85,7 @@ const connectDB = async () => {
   }
 };
 
+// Auto-initialize database when module is loaded
+connectDB();
+
 module.exports = { sequelize, connectDB };
