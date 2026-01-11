@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge";
 import FileViewer from "./FileViewer";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import axios from "@/lib/axios";
 
 interface PortfolioItem {
   _id: string;
@@ -47,9 +48,10 @@ const Portfolio = () => {
   const fetchPortfolios = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/portfolio?category=${selectedCategory}&limit=12`);
-      const data = await response.json();
-      setPortfolios(data.portfolios || []);
+      const params = new URLSearchParams({ limit: '12' });
+      if (selectedCategory !== 'all') params.append('category', selectedCategory);
+      const response = await axios.get(`/api/portfolio?${params}`);
+      setPortfolios(response.data.portfolios || []);
     } catch (error) {
       console.error('Failed to fetch portfolios:', error);
     } finally {
