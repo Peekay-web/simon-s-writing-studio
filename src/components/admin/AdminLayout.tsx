@@ -68,7 +68,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:static lg:inset-0`}>
+        } lg:static lg:inset-0 flex flex-col`}>
         <div className="flex items-center justify-between h-16 px-6 border-b">
           <h1 className="font-display text-xl font-bold text-primary">Admin Panel</h1>
           <Button
@@ -81,25 +81,27 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </Button>
         </div>
 
-        <nav className="mt-6">
-          {menuItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary/10 text-primary border-r-2 border-primary'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <item.icon className="mr-3 h-5 w-5" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="flex-1 overflow-y-auto py-6 pb-32">
+          <nav className="space-y-1">
+            {menuItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${isActive
+                    ? 'bg-primary/10 text-primary border-r-2 border-primary'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <item.icon className="mr-3 h-5 w-5" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-6 border-t">
           <div className="flex items-center mb-4">
