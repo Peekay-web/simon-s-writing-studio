@@ -1,23 +1,19 @@
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import About from "@/components/About";
-import Services from "@/components/Services";
-import Clients from "@/components/Clients";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ContactSection from "@/components/Contact";
 
-const Index = () => {
+const Contact = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <Hero />
-      <About />
-      <Services />
-      <Clients />
+      <main className="pt-14">
+        <ContactSection />
+      </main>
       <Footer />
       <WhatsAppButton />
     </div>
   );
 };
 
-export default Index;
+export default Contact;
