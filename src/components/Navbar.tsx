@@ -5,12 +5,10 @@ import ThemeToggle from "./ThemeToggle";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "#about", label: "About" },
-  { href: "#services", label: "Services" },
-  { href: "#portfolio", label: "Portfolio" },
+  { href: "/portfolio", label: "Portfolio" },
   { href: "/testimonials", label: "Testimonials" },
   { href: "/blog", label: "Blog" },
-  { href: "#contact", label: "Contact" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const Navbar = () => {
@@ -54,7 +52,7 @@ const Navbar = () => {
             ))}
             <ThemeToggle />
             <Button size="sm" className="bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105" asChild>
-              <a href="#contact">Hire Me</a>
+              <a href="/contact">Hire Me</a>
             </Button>
           </div>
 
@@ -86,7 +84,7 @@ const Navbar = () => {
                 </a>
               ))}
               <Button size="sm" className="bg-primary hover:bg-primary/90 w-fit mt-2 transition-all duration-200" asChild>
-                <a href="#contact" onClick={() => setIsOpen(false)}>Hire Me</a>
+                <a href="/contact" onClick={() => setIsOpen(false)}>Hire Me</a>
               </Button>
             </div>
           </div>

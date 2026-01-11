@@ -23,7 +23,7 @@ const Hero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-2 animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <Button size="lg" className="bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 hover:shadow-lg" asChild>
-                <a href="#contact">
+                <a href="/contact">
                   Hire Me
                 </a>
               </Button>
