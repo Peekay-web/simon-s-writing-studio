@@ -4,6 +4,9 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+// Initialize database
+require('./config/database');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
