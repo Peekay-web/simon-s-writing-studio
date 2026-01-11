@@ -28,7 +28,7 @@ const Footer = () => {
               Hon. Chukwuemeka Samuel PK Simon
             </h3>
             <p className="text-background/70 leading-relaxed mb-4 text-sm">
-              Professional Research Writer, Consultant, and Freelancer dedicated to 
+              Professional Research Writer, Consultant, and Freelancer dedicated to
               helping you achieve your academic and professional goals.
             </p>
             <div className="flex gap-3">
@@ -52,8 +52,8 @@ const Footer = () => {
             <h4 className="font-display text-base font-semibold mb-3 text-primary-foreground">Contact Info</h4>
             <ul className="space-y-2 text-background/70 text-sm">
               <li>
-                <a 
-                  href="mailto:chukwuemekasimon@yahoo.com" 
+                <a
+                  href="mailto:chukwuemekasimon@yahoo.com"
                   className="hover:text-primary transition-colors duration-200 break-all"
                 >
                   chukwuemekasimon@yahoo.com
@@ -72,7 +72,14 @@ const Footer = () => {
         {/* Copyright */}
         <div className="border-t border-background/20 pt-6 text-center">
           <p className="text-background/60 text-xs">
-            © {currentYear} Hon. Chukwuemeka Samuel PK Simon. All rights reserved.
+            © {currentYear} Hon. Chukwuemeka Samuel PK Simon. All rights reserved.{' '}
+            <a
+              href="/admin/login"
+              className="text-background/60 hover:text-background/80 transition-colors"
+              style={{ textDecoration: 'none' }}
+            >
+              Admin
+            </a>
           </p>
         </div>
       </div>

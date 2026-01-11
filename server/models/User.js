@@ -8,12 +8,12 @@ const User = sequelize.define('User', {
     primaryKey: true,
     autoIncrement: true
   },
-  email: {
+  username: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
     validate: {
-      isEmail: true
+      len: [3, 50]
     }
   },
   password: {
@@ -51,7 +51,7 @@ const User = sequelize.define('User', {
 });
 
 // Instance method to compare password
-User.prototype.comparePassword = async function(candidatePassword) {
+User.prototype.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 

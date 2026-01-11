@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
+const User = require('../models/User');
 
 const router = express.Router();
 
@@ -8,7 +9,8 @@ const router = express.Router();
 // @desc    Admin login
 // @access  Public
 router.post('/login', [
-  body('password').isLength({ min: 6 })
+  body('username').notEmpty().withMessage('Username is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -16,11 +18,19 @@ router.post('/login', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { password } = req.body;
+    const { username, password } = req.body;
 
-    // Check against in-memory storage (password-only login)
-    const user = global.inMemoryStorage.users.find(u => u.password === password);
+    // Find user by username
+    const user = await User.findOne({ where: { username } });
+
     if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Check password
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
@@ -28,8 +38,7 @@ router.post('/login', [
     const payload = {
       user: {
         id: user.id,
-        name: user.name,
-        email: user.email,
+        username: user.username,
         role: user.role
       }
     };
@@ -40,8 +49,7 @@ router.post('/login', [
       token,
       user: {
         id: user.id,
-        name: user.name,
-        email: user.email,
+        username: user.username,
         role: user.role
       }
     });
@@ -58,22 +66,21 @@ router.post('/login', [
 router.get('/me', async (req, res) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
-    const user = global.inMemoryStorage.users.find(u => u.id === decoded.user.id);
-    
+    const user = await User.findByPk(decoded.user.id);
+
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
 
     res.json({
       id: user.id,
-      name: user.name,
-      email: user.email,
+      username: user.username,
       role: user.role
     });
   } catch (error) {

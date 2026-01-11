@@ -9,10 +9,11 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
 const AdminLogin = () => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const { login, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -25,11 +26,11 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!password) {
+
+    if (!username || !password) {
       toast({
         title: 'Error',
-        description: 'Please enter the password',
+        description: 'Please enter both username and password',
         variant: 'destructive'
       });
       return;
@@ -37,7 +38,7 @@ const AdminLogin = () => {
 
     setLoading(true);
     try {
-      await login(password);
+      await login(username, password);
       toast({
         title: 'Success',
         description: 'Welcome to the admin dashboard!'
@@ -69,12 +70,24 @@ const AdminLogin = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password">Admin Password</Label>
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Enter username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={loading}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter admin password"
+                  placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
