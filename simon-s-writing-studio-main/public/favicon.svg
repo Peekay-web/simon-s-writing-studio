@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#goldGradient)" stroke="#8B4513" stroke-width="2"/>
+  
+  <!-- Inner circle -->
+  <circle cx="50" cy="50" r="38" fill="#FFFFFF" stroke="#8B4513" stroke-width="1"/>
+  
+  <!-- PK Text -->
+  <text x="50" y="40" font-family="serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#8B4513">PK</text>
+  
+  <!-- Koncepts text -->
+  <text x="50" y="55" font-family="serif" font-size="8" text-anchor="middle" fill="#8B4513">Koncepts</text>
+  
+  <!-- Decorative elements -->
+  <path d="M 25 65 Q 50 70 75 65" stroke="#DAA520" stroke-width="1" fill="none"/>
+  <path d="M 25 35 Q 50 30 75 35" stroke="#DAA520" stroke-width="1" fill="none"/>
+</svg>
