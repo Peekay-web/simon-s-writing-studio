@@ -92,7 +92,7 @@ console.log(`📊 Sample data loaded: ${inMemoryStorage.portfolios.length} portf
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8080',
+  origin: process.env.FRONTEND_URL || ['http://localhost:5173', 'http://localhost:8080'],
   credentials: true
 }));
 
@@ -122,9 +122,9 @@ app.use('/api/analytics', require('./routes/analytics'));
 app.get('/api/health', (req, res) => {
   const uptime = process.uptime();
   const timestamp = new Date().toISOString();
-  
-  res.json({ 
-    status: 'OK', 
+
+  res.json({
+    status: 'OK',
     timestamp,
     uptime: `${Math.floor(uptime / 60)} minutes`,
     environment: process.env.NODE_ENV || 'development',
@@ -140,7 +140,7 @@ app.get('/ping', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err.message : {}
   });
@@ -154,16 +154,16 @@ app.use('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  
+
   // Enhanced keep-alive mechanism for Render free tier
   if (process.env.NODE_ENV === 'production') {
     const keepAlive = () => {
       const timestamp = new Date().toISOString();
       console.log(`🔄 Keep-alive ping at ${timestamp}`);
-      
+
       // Make a self-request to keep the service active
       const selfUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
-      
+
       // Use native fetch (available in Node.js 18+)
       fetch(`${selfUrl}/api/health`)
         .then(response => {
@@ -177,10 +177,10 @@ app.listen(PORT, () => {
           console.log('❌ Self-ping error:', error.message);
         });
     };
-    
+
     // Initial ping after 30 seconds
     setTimeout(keepAlive, 30000);
-    
+
     // Ping every 5 minutes to prevent sleeping (more frequent than 15 min timeout)
     setInterval(keepAlive, 5 * 60 * 1000);
     console.log('⏰ Enhanced keep-alive mechanism started (5 min intervals with self-ping)');
