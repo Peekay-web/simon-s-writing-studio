@@ -15,6 +15,8 @@ const contactSchema = z.object({
   message: z.string().trim().min(1, "Message is required").max(2000, "Message must be less than 2000 characters"),
 });
 
+const WHATSAPP_NUMBER = "2348082453150";
+
 const Contact = () => {
   const { toast } = useToast();
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
@@ -45,12 +47,17 @@ const Contact = () => {
     try {
       contactSchema.parse(formData);
       
-      // Simulate form submission
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Build WhatsApp message
+      const whatsappMessage = `*New Contact Form Submission*%0A%0A*Name:* ${encodeURIComponent(formData.name)}%0A*Email:* ${encodeURIComponent(formData.email)}%0A*Subject:* ${encodeURIComponent(formData.subject)}%0A%0A*Message:*%0A${encodeURIComponent(formData.message)}`;
+      
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
+      
+      // Open WhatsApp in a new tab
+      window.open(whatsappUrl, '_blank');
       
       toast({
-        title: "Message Sent!",
-        description: "Thank you for reaching out. I'll get back to you soon.",
+        title: "Redirecting to WhatsApp!",
+        description: "Complete your message on WhatsApp to send it directly.",
       });
       
       setFormData({ name: "", email: "", subject: "", message: "" });
