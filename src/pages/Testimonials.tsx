@@ -169,7 +169,7 @@ const Testimonials = () => {
                     Add Your Testimonial
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-md">
                   <DialogHeader>
                     <DialogTitle>Share Your Experience</DialogTitle>
                   </DialogHeader>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Eye, FileText, Upload, X, Loader2, Paperclip, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, FileText, Upload, Loader2, Paperclip, Image as ImageIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,7 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import axios, { API_BASE_URL } from '@/lib/axios';
 
 interface PortfolioItem {
-  id: string | number; // Changed from _id to id to match Sequelize
+  id: string | number;
   title: string;
   description: string;
   category: string;
@@ -26,6 +26,7 @@ interface PortfolioItem {
     size: number;
   };
   customThumbnail?: string;
+  thumbnail?: string;
   views: number;
   isPublished: boolean;
   createdAt: string;
@@ -61,7 +62,7 @@ const AdminPortfolio = () => {
   const fetchItems = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/portfolio?category=all&limit=100'); // Fetch all for admin
+      const response = await axios.get('/api/admin/portfolio?limit=100');
       setItems(response.data.portfolios || []);
     } catch (error) {
       console.error('Error fetching portfolio items:', error);
@@ -114,7 +115,6 @@ const AdminPortfolio = () => {
       data.append('description', formData.description);
       data.append('category', formData.category);
 
-      // Convert tags string to array
       const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
       data.append('tags', JSON.stringify(tagsArray));
 
@@ -275,7 +275,6 @@ const AdminPortfolio = () => {
                     />
                   </div>
 
-                  {/* File Upload Section */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Project File (PDF, Doc, etc.)</Label>
@@ -360,7 +359,6 @@ const AdminPortfolio = () => {
           </Dialog>
         </div>
 
-        {/* Portfolio List */}
         {loading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -386,9 +384,9 @@ const AdminPortfolio = () => {
             {items.map((item) => (
               <Card key={item.id} className="group hover:shadow-lg transition-shadow duration-200">
                 <div className="h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center border-b">
-                  {item.customThumbnail ? (
+                  {item.customThumbnail || item.thumbnail ? (
                     <img
-                      src={`${API_BASE_URL}/${item.customThumbnail}`}
+                      src={item.customThumbnail?.startsWith('http') ? item.customThumbnail : `${API_BASE_URL}/${item.customThumbnail}`}
                       alt={item.title}
                       className="w-full h-full object-cover"
                     />
@@ -430,7 +428,7 @@ const AdminPortfolio = () => {
                     {item.file && (
                       <span className="flex items-center" title={`${item.file.originalName} (${Math.round(item.file.size / 1024)}KB)`}>
                         <Paperclip className="w-3 h-3 mr-1" />
-                        File attached
+                        {item.file ? 'File attached' : 'No file'}
                       </span>
                     )}
                   </div>
@@ -439,7 +437,7 @@ const AdminPortfolio = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 hover:bg-primary hover:text-white transition-colors"
+                      className="flex-1 hover:bg-primary hover:text-white transition-all duration-200"
                       onClick={() => handleEdit(item)}
                     >
                       <Edit className="w-4 h-4 mr-2" />
@@ -448,7 +446,7 @@ const AdminPortfolio = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 transition-colors"
+                      className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 transition-all duration-200"
                       onClick={() => handleDelete(item.id)}
                     >
                       <Trash2 className="w-4 h-4" />

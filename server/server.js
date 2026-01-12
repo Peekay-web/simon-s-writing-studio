@@ -2,84 +2,20 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 
 // Initialize database
-require('./config/database');
+const { connectDB } = require('./config/database');
 require('./models'); // Load models and associations
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Simple in-memory storage for production (to avoid SQLite segfaults)
-const inMemoryStorage = {
-  users: [
-    {
-      id: 1,
-      name: 'Hon. Chukwuemeka Samuel PK Simon',
-      email: process.env.ADMIN_EMAIL || 'PARAKLETOS@ADMINRG-CFKA0M4',
-      password: process.env.ADMIN_PASSWORD || 'GODABEG',
-      role: 'admin'
-    }
-  ],
-  portfolios: [
-    {
-      id: 1,
-      title: 'Academic Research Paper',
-      description: 'Comprehensive research on modern writing techniques',
-      category: 'research',
-      isPublished: true,
-      views: 45,
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 2,
-      title: 'Business Content Strategy',
-      description: 'Strategic content development for corporate clients',
-      category: 'business',
-      isPublished: true,
-      views: 32,
-      createdAt: new Date().toISOString()
-    }
-  ],
-  testimonials: [
-    {
-      id: 1,
-      name: 'Dr. Sarah Johnson',
-      email: 'sarah@university.edu',
-      status: 'Professor',
-      career: 'Academic Research',
-      rating: 5,
-      statement: 'Exceptional writing quality and attention to detail. Highly recommended for academic projects.',
-      projectType: 'research',
-      isApproved: true,
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      email: 'michael@company.com',
-      status: 'Marketing Director',
-      career: 'Corporate Marketing',
-      rating: 5,
-      statement: 'Outstanding content creation that perfectly captured our brand voice.',
-      projectType: 'content',
-      isApproved: true,
-      createdAt: new Date().toISOString()
-    }
-  ],
-  analytics: []
-};
-
-// Make storage available globally
-global.inMemoryStorage = inMemoryStorage;
-
-console.log('✅ In-memory storage initialized');
-console.log(`👤 Admin user: ${inMemoryStorage.users[0].name} (${inMemoryStorage.users[0].email})`);
-console.log(`📊 Sample data loaded: ${inMemoryStorage.portfolios.length} portfolios, ${inMemoryStorage.testimonials.length} testimonials`);
-
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
 app.use(cors({
   origin: process.env.FRONTEND_URL || ['http://localhost:5173', 'http://localhost:8080'],
   credentials: true
@@ -97,7 +33,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static files for uploads
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -149,10 +85,8 @@ app.listen(PORT, () => {
       const timestamp = new Date().toISOString();
       console.log(`🔄 Keep-alive ping at ${timestamp}`);
 
-      // Make a self-request to keep the service active
       const selfUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 
-      // Use native fetch (available in Node.js 18+)
       fetch(`${selfUrl}/api/health`)
         .then(response => {
           if (response.ok) {
@@ -166,10 +100,7 @@ app.listen(PORT, () => {
         });
     };
 
-    // Initial ping after 30 seconds
     setTimeout(keepAlive, 30000);
-
-    // Ping every 5 minutes to prevent sleeping (more frequent than 15 min timeout)
     setInterval(keepAlive, 5 * 60 * 1000);
     console.log('⏰ Enhanced keep-alive mechanism started (5 min intervals with self-ping)');
   }
