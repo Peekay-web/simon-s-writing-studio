@@ -16,7 +16,7 @@ const services = [
   {
     icon: Pen,
     title: "Content Writing",
-    description: "Engaging and SEO-optimized content for websites, blogs, articles, and digital platforms.",
+    description: "Engaging and SEO-optimized content for websites, articles, and digital platforms.",
   },
   {
     icon: FileEdit,
@@ -42,11 +42,10 @@ const Services = () => {
   return (
     <section id="services" className="py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6">
-        <div 
+        <div
           ref={headerRef}
-          className={`max-w-3xl mx-auto text-center mb-10 transition-all duration-700 ${
-            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
+          className={`max-w-3xl mx-auto text-center mb-10 transition-all duration-700 ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
         >
           <p className="text-sm uppercase tracking-[0.3em] text-primary font-medium mb-3">
             What I Offer
@@ -62,11 +61,10 @@ const Services = () => {
 
         <div ref={cardsRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {services.map((service, index) => (
-            <Card 
-              key={service.title} 
-              className={`group hover:border-primary/50 hover:shadow-lg transition-all duration-500 h-full cursor-default ${
-                cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-              }`}
+            <Card
+              key={service.title}
+              className={`group hover:border-primary/50 hover:shadow-lg transition-all duration-500 h-full cursor-default ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                }`}
               style={{ transitionDelay: `${index * 80}ms` }}
             >
               <CardHeader className="pb-3">

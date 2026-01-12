@@ -8,15 +8,12 @@ import { AnimatePresence } from "framer-motion";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Testimonials from "./pages/Testimonials";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
 import Portfolio from "./pages/Portfolio";
 import Contact from "./pages/Contact";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminPortfolio from "./pages/admin/AdminPortfolio";
 import AdminTestimonials from "./pages/admin/AdminTestimonials";
-import AdminBlog from "./pages/admin/AdminBlog";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminSettings from "./pages/admin/AdminSettings";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -26,7 +23,7 @@ const queryClient = new QueryClient();
 
 const AnimatedRoutes = () => {
   const location = useLocation();
-  
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
@@ -34,18 +31,14 @@ const AnimatedRoutes = () => {
         <Route path="/portfolio" element={<PageTransition><Portfolio /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/testimonials" element={<PageTransition><Testimonials /></PageTransition>} />
-        <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
-        <Route path="/blog/:slug" element={<PageTransition><BlogPost /></PageTransition>} />
-        
         {/* Admin Routes */}
         <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
         <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
         <Route path="/admin/portfolio" element={<PageTransition><AdminPortfolio /></PageTransition>} />
         <Route path="/admin/testimonials" element={<PageTransition><AdminTestimonials /></PageTransition>} />
-        <Route path="/admin/blog" element={<PageTransition><AdminBlog /></PageTransition>} />
         <Route path="/admin/analytics" element={<PageTransition><AdminAnalytics /></PageTransition>} />
         <Route path="/admin/settings" element={<PageTransition><AdminSettings /></PageTransition>} />
-        
+
         {/* Catch-all route */}
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>

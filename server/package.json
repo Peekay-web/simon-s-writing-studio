@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "test": "jest",
     "build": "echo 'No build step needed for backend'",
-    "postinstall": "mkdir -p uploads/portfolio uploads/blog"
+    "postinstall": "mkdir -p uploads/portfolio"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

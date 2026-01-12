@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  MessageSquare, 
-  BarChart3, 
-  Settings, 
+import {
+  LayoutDashboard,
+  FileText,
+  MessageSquare,
+  BarChart3,
+  Settings,
   LogOut,
   Menu,
   X
@@ -39,7 +39,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/admin/portfolio', icon: FileText, label: 'Portfolio' },
     { path: '/admin/testimonials', icon: MessageSquare, label: 'Testimonials' },
-    { path: '/admin/blog', icon: FileText, label: 'Blog' },
     { path: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
     { path: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
@@ -60,16 +59,15 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:flex-shrink-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:flex-shrink-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
         <div className="flex items-center justify-between h-16 px-6 border-b">
           <h1 className="font-display text-xl font-bold text-primary">Admin Panel</h1>
           <Button
@@ -82,37 +80,38 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </Button>
         </div>
 
-        <nav className="mt-6">
-          {menuItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${
-                  isActive
+        <div className="flex-1 overflow-y-auto py-6 pb-32">
+          <nav className="space-y-1">
+            {menuItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${isActive
                     ? 'bg-primary/10 text-primary border-r-2 border-primary'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <item.icon className="mr-3 h-5 w-5" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+                    }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <item.icon className="mr-3 h-5 w-5" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-6 border-t">
           <div className="flex items-center mb-4">
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
               <span className="text-sm font-medium text-primary">
-                {user.email.charAt(0).toUpperCase()}
+                {user.username?.charAt(0).toUpperCase()}
               </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
-                {user.email}
+                {user.username}
               </p>
               <p className="text-xs text-gray-500 capitalize">{user.role}</p>
             </div>
@@ -141,7 +140,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           >
             <Menu className="h-5 w-5" />
           </Button>
-          
           <div className="flex items-center space-x-4 ml-auto">
             <Link to="/" className="text-sm text-gray-600 hover:text-gray-900">
               ← Back to Website
