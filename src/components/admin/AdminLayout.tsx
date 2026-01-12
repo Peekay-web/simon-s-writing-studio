@@ -57,7 +57,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -67,9 +67,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:flex-shrink-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:static lg:inset-0`}>
+      }`}>
         <div className="flex items-center justify-between h-16 px-6 border-b">
           <h1 className="font-display text-xl font-bold text-primary">Admin Panel</h1>
           <Button
@@ -127,10 +127,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             Logout
           </Button>
         </div>
-      </div>
+      </aside>
 
       {/* Main content */}
-      <div className="lg:ml-64">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <div className="bg-white shadow-sm border-b h-16 flex items-center justify-between px-6">
           <Button
@@ -142,7 +142,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <Menu className="h-5 w-5" />
           </Button>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 ml-auto">
             <Link to="/" className="text-sm text-gray-600 hover:text-gray-900">
               ← Back to Website
             </Link>
@@ -150,7 +150,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="p-6 flex-1">
           {children}
         </main>
       </div>
