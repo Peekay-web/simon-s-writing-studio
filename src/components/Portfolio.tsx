@@ -20,12 +20,76 @@ interface PortfolioItem {
   createdAt: string;
 }
 
+// Sample portfolio items for fallback when API returns empty
+const samplePortfolios: PortfolioItem[] = [
+  {
+    id: '1',
+    title: 'PhD Thesis on Renewable Energy Policy',
+    description: 'Comprehensive research thesis examining the impact of renewable energy policies on sustainable development in West Africa.',
+    category: 'research',
+    tags: ['PhD', 'Research', 'Energy Policy'],
+    views: 245,
+    hasFile: false,
+    createdAt: '2024-01-15'
+  },
+  {
+    id: '2',
+    title: 'MSc Dissertation - Financial Markets Analysis',
+    description: 'In-depth analysis of emerging market dynamics and their influence on global financial stability.',
+    category: 'academic',
+    tags: ['MSc', 'Finance', 'Markets'],
+    views: 189,
+    hasFile: false,
+    createdAt: '2024-02-20'
+  },
+  {
+    id: '3',
+    title: 'Corporate Brand Strategy Document',
+    description: 'Strategic brand positioning and messaging framework for a leading technology startup.',
+    category: 'copywriting',
+    tags: ['Branding', 'Strategy', 'Tech'],
+    views: 312,
+    hasFile: false,
+    createdAt: '2024-03-10'
+  },
+  {
+    id: '4',
+    title: 'Educational Content Series',
+    description: 'Engaging educational content series designed for online learning platforms and academic institutions.',
+    category: 'content',
+    tags: ['Education', 'E-Learning', 'Content'],
+    views: 156,
+    hasFile: false,
+    createdAt: '2024-04-05'
+  },
+  {
+    id: '5',
+    title: 'Business Consulting Report',
+    description: 'Comprehensive market analysis and strategic recommendations for business expansion in African markets.',
+    category: 'consulting',
+    tags: ['Business', 'Strategy', 'Africa'],
+    views: 278,
+    hasFile: false,
+    createdAt: '2024-05-12'
+  },
+  {
+    id: '6',
+    title: 'Academic Journal Editing',
+    description: 'Professional editing and proofreading services for peer-reviewed academic journal submissions.',
+    category: 'editing',
+    tags: ['Editing', 'Academic', 'Journal'],
+    views: 134,
+    hasFile: false,
+    createdAt: '2024-06-18'
+  }
+];
+
 const Portfolio = () => {
   const [portfolios, setPortfolios] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPortfolio, setSelectedPortfolio] = useState<PortfolioItem | null>(null);
-
+  
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: filterRef, isVisible: filterVisible } = useScrollAnimation({ threshold: 0.2 });
   const { ref: gridRef, isVisible: gridVisible } = useScrollAnimation({ threshold: 0.1 });
@@ -50,9 +114,24 @@ const Portfolio = () => {
       const params = new URLSearchParams({ limit: '12' });
       if (selectedCategory !== 'all') params.append('category', selectedCategory);
       const response = await axios.get(`/api/portfolio?${params}`);
-      setPortfolios(response.data.portfolios || []);
+      const apiPortfolios = response.data.portfolios || [];
+      // Use API data if available, otherwise use sample data
+      if (apiPortfolios.length > 0) {
+        setPortfolios(apiPortfolios);
+      } else {
+        // Filter sample portfolios by category
+        const filtered = selectedCategory === 'all' 
+          ? samplePortfolios 
+          : samplePortfolios.filter(p => p.category === selectedCategory);
+        setPortfolios(filtered);
+      }
     } catch (error) {
       console.error('Failed to fetch portfolios:', error);
+      // On error, show sample portfolios
+      const filtered = selectedCategory === 'all' 
+        ? samplePortfolios 
+        : samplePortfolios.filter(p => p.category === selectedCategory);
+      setPortfolios(filtered);
     } finally {
       setLoading(false);
     }
