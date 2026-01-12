@@ -3,7 +3,7 @@ const Portfolio = require('./Portfolio');
 const Testimonial = require('./Testimonial');
 const Analytics = require('./Analytics');
 
-// Define associations
+// Defined associations
 User.hasMany(Portfolio, { foreignKey: 'authorId', as: 'portfolios' });
 Portfolio.belongsTo(User, { foreignKey: 'authorId', as: 'author' });
 

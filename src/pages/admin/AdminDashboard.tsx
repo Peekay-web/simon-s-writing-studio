@@ -5,7 +5,6 @@ import {
   Eye,
   TrendingUp,
   Users,
-  Calendar,
   Star
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +22,7 @@ interface DashboardStats {
 }
 
 interface RecentTestimonial {
-  id: string;
+  id: string | number;
   name: string;
   rating: number;
   review: string;
@@ -32,7 +31,7 @@ interface RecentTestimonial {
 }
 
 interface TopPortfolio {
-  id: string;
+  id: string | number;
   title: string;
   views: number;
   category: string;
@@ -159,15 +158,15 @@ const AdminDashboard = () => {
                                 <Star
                                   key={i}
                                   className={`h-3 w-3 ${i < testimonial.rating
-                                      ? 'text-yellow-400 fill-current'
-                                      : 'text-gray-300'
+                                    ? 'text-yellow-400 fill-current'
+                                    : 'text-gray-300'
                                     }`}
                                 />
                               ))}
                             </div>
                           </div>
                           <p className="text-xs text-muted-foreground mb-2">
-                            {testimonial.review.substring(0, 100)}...
+                            {testimonial.review ? (testimonial.review.substring(0, 100) + (testimonial.review.length > 100 ? '...' : '')) : 'No statement provided'}
                           </p>
                           <Badge variant="secondary" className="text-xs">
                             {testimonial.projectType}
@@ -237,21 +236,21 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3">
-              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+              <a href="/admin/portfolio" className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors block">
                 <FileText className="h-8 w-8 text-primary mb-2" />
                 <h3 className="font-medium">Add Portfolio Item</h3>
                 <p className="text-sm text-muted-foreground">Upload a new project to showcase</p>
-              </div>
-              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+              </a>
+              <a href="/admin/testimonials" className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors block">
                 <MessageSquare className="h-8 w-8 text-primary mb-2" />
                 <h3 className="font-medium">Review Testimonials</h3>
                 <p className="text-sm text-muted-foreground">Approve or reject pending reviews</p>
-              </div>
-              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+              </a>
+              <a href="/admin/analytics" className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors block">
                 <TrendingUp className="h-8 w-8 text-primary mb-2" />
                 <h3 className="font-medium">View Analytics</h3>
                 <p className="text-sm text-muted-foreground">Check your website performance</p>
-              </div>
+              </a>
             </div>
           </CardContent>
         </Card>

@@ -5,6 +5,7 @@ const fs = require('fs').promises;
 const Portfolio = require('../models/Portfolio');
 const Analytics = require('../models/Analytics');
 const FileConverter = require('../services/fileConverter');
+const CloudinaryService = require('../services/cloudinary');
 const auth = require('../middleware/auth');
 const { Op } = require('sequelize');
 
@@ -63,12 +64,18 @@ router.get('/', async (req, res) => {
       where,
       order: [['order', 'ASC'], ['createdAt', 'DESC']],
       limit: parseInt(limit),
-      offset: parseInt(offset),
-      attributes: { exclude: ['file'] } // Don't expose file paths to public
+      offset: parseInt(offset)
+    });
+
+    const portfolioList = portfolios.map(p => {
+      const portfolioData = p.get({ plain: true });
+      const hasFile = !!(portfolioData.file && (portfolioData.file.url || portfolioData.file.path || portfolioData.file.filename));
+      delete portfolioData.file;
+      return { ...portfolioData, hasFile };
     });
 
     res.json({
-      portfolios,
+      portfolios: portfolioList,
       totalPages: Math.ceil(count / limit),
       currentPage: parseInt(page),
       total: count
@@ -120,7 +127,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // @route   GET /api/portfolio/:id/view
-// @desc    View portfolio file (secure viewing with conversion)
+// @desc    View portfolio file (rich preview with conversion)
 // @access  Public
 router.get('/:id/view', async (req, res) => {
   try {
@@ -130,32 +137,79 @@ router.get('/:id/view', async (req, res) => {
       return res.status(404).json({ message: 'File not found' });
     }
 
-    const filePath = path.join(__dirname, '..', portfolio.file.path);
-    const fileType = FileConverter.getFileType(portfolio.file.filename);
+    const fileInfo = portfolio.file;
+    console.log('=== PORTFOLIO VIEW DEBUG ===');
+    console.log('Portfolio ID:', req.params.id);
+    console.log('File info:', JSON.stringify(fileInfo, null, 2));
+    
+    // Get file extension from originalName or filename
+    const fileName = fileInfo.originalName || fileInfo.filename || '';
+    const fileExtension = fileName.toLowerCase().split('.').pop();
+    
+    console.log('File name:', fileName);
+    console.log('File extension:', fileExtension);
+    
+    // FORCE PDF HANDLING - If it's a PDF, serve directly
+    if (fileExtension === 'pdf') {
+      console.log('🔴 DETECTED PDF - SERVING DIRECTLY');
+      const pdfUrl = fileInfo.url || `/api/portfolio/${portfolio.id}/file`;
+      
+      return res.json({
+        fileType: 'pdf-raw',
+        originalName: fileName,
+        url: pdfUrl
+      });
+    }
+    
+    // For non-PDF files, try conversion
+    console.log('📄 NON-PDF FILE - ATTEMPTING CONVERSION');
+    const fileSource = fileInfo.url || (fileInfo.path ? path.join(__dirname, '..', fileInfo.path) : null);
 
-    // For PDF files, serve directly
-    if (fileType === 'pdf') {
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'inline');
-      res.setHeader('X-Content-Type-Options', 'nosniff');
-      return res.sendFile(filePath);
+    if (!fileSource) {
+      return res.status(404).json({ message: 'File source not found' });
     }
 
-    // For Office files, convert and return JSON
     try {
-      const convertedData = await FileConverter.convertFile(filePath);
+      const convertedData = await FileConverter.convertFile(fileSource);
+      
       res.json({
         fileType: convertedData.type,
-        originalName: portfolio.file.originalName,
+        originalName: fileName,
         data: convertedData.data
       });
     } catch (conversionError) {
       console.error('File conversion error:', conversionError);
-      // Fallback: try to serve the original file
-      res.setHeader('Content-Type', portfolio.file.mimetype);
-      res.setHeader('Content-Disposition', 'inline');
-      res.sendFile(filePath);
+      res.status(500).json({ message: 'Conversion failed', error: conversionError.message });
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/portfolio/:id/file
+// @desc    Get portfolio file directly (Public if published)
+// @access  Public
+router.get('/:id/file', async (req, res) => {
+  try {
+    const portfolio = await Portfolio.findByPk(req.params.id);
+
+    if (!portfolio || (!portfolio.isPublished && !req.headers.authorization)) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+
+    if (!portfolio.file) {
+      return res.status(404).json({ message: 'No file attached to this project' });
+    }
+
+    if (portfolio.file.url) {
+      return res.redirect(portfolio.file.url);
+    }
+
+    const filePath = path.join(__dirname, '..', portfolio.file.path);
+    res.setHeader('Content-Type', portfolio.file.mimetype);
+    res.setHeader('Content-Disposition', 'inline');
+    res.sendFile(filePath);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -205,19 +259,22 @@ router.post('/', auth, upload.fields([
     // Handle main file upload
     if (req.files && req.files.file) {
       const file = req.files.file[0];
+      const uploadResult = await CloudinaryService.uploadFile(file.path, 'portfolio');
       portfolioData.file = {
-        originalName: file.originalname,
-        filename: file.filename,
-        path: file.path,
+        originalName: uploadResult.originalName,
+        url: uploadResult.url,
+        publicId: uploadResult.publicId,
         mimetype: file.mimetype,
-        size: file.size
+        size: uploadResult.size
       };
     }
 
     // Handle custom thumbnail
     if (req.files && req.files.thumbnail) {
       const thumbnail = req.files.thumbnail[0];
-      portfolioData.customThumbnail = thumbnail.path;
+      const uploadResult = await CloudinaryService.uploadFile(thumbnail.path, 'thumbnails');
+      portfolioData.customThumbnail = uploadResult.url;
+      portfolioData.thumbnailPublicId = uploadResult.publicId;
     }
 
     if (portfolioData.isPublished) {
@@ -258,7 +315,11 @@ router.put('/:id', auth, upload.fields([
     if (title) portfolio.title = title;
     if (description) portfolio.description = description;
     if (category) portfolio.category = category;
-    if (tags) portfolio.tags = JSON.parse(tags);
+
+    if (tags) {
+      portfolio.tags = JSON.parse(tags);
+      portfolio.changed('tags', true);
+    }
 
     // Handle publishing status
     if (isPublished !== undefined) {
@@ -272,37 +333,48 @@ router.put('/:id', auth, upload.fields([
 
     // Handle file updates
     if (req.files && req.files.file) {
-      // Delete old file if exists
-      if (portfolio.file && portfolio.file.path) {
+      // Delete old file from Cloudinary if exists
+      if (portfolio.file && portfolio.file.publicId) {
+        await CloudinaryService.deleteFile(portfolio.file.publicId);
+      } else if (portfolio.file && portfolio.file.path) {
+        // Fallback for local files
         try {
           await fs.unlink(portfolio.file.path);
         } catch (err) {
-          console.log('Old file not found:', err.message);
+          console.log('Old local file not found:', err.message);
         }
       }
 
       const file = req.files.file[0];
+      const uploadResult = await CloudinaryService.uploadFile(file.path, 'portfolio');
       portfolio.file = {
-        originalName: file.originalname,
-        filename: file.filename,
-        path: file.path,
+        originalName: uploadResult.originalName,
+        url: uploadResult.url,
+        publicId: uploadResult.publicId,
         mimetype: file.mimetype,
-        size: file.size
+        size: uploadResult.size
       };
+      portfolio.changed('file', true);
     }
 
     // Handle thumbnail updates
     if (req.files && req.files.thumbnail) {
       // Delete old thumbnail if exists
-      if (portfolio.customThumbnail) {
+      if (portfolio.thumbnailPublicId) {
+        await CloudinaryService.deleteFile(portfolio.thumbnailPublicId);
+      } else if (portfolio.customThumbnail && !portfolio.customThumbnail.startsWith('http')) {
+        // Fallback for local files
         try {
           await fs.unlink(portfolio.customThumbnail);
         } catch (err) {
-          console.log('Old thumbnail not found:', err.message);
+          console.log('Old local thumbnail not found:', err.message);
         }
       }
 
-      portfolio.customThumbnail = req.files.thumbnail[0].path;
+      const thumbnail = req.files.thumbnail[0];
+      const uploadResult = await CloudinaryService.uploadFile(thumbnail.path, 'thumbnails');
+      portfolio.customThumbnail = uploadResult.url;
+      portfolio.thumbnailPublicId = uploadResult.publicId;
     }
 
     await portfolio.save();
@@ -324,20 +396,24 @@ router.delete('/:id', auth, async (req, res) => {
       return res.status(404).json({ message: 'Portfolio item not found' });
     }
 
-    // Delete associated files
-    if (portfolio.file && portfolio.file.path) {
+    // Delete associated files from Cloudinary
+    if (portfolio.file && portfolio.file.publicId) {
+      await CloudinaryService.deleteFile(portfolio.file.publicId);
+    } else if (portfolio.file && portfolio.file.path) {
       try {
         await fs.unlink(portfolio.file.path);
       } catch (err) {
-        console.log('File not found:', err.message);
+        console.log('Local file not found during deletion:', err.message);
       }
     }
 
-    if (portfolio.customThumbnail) {
+    if (portfolio.thumbnailPublicId) {
+      await CloudinaryService.deleteFile(portfolio.thumbnailPublicId);
+    } else if (portfolio.customThumbnail && !portfolio.customThumbnail.startsWith('http')) {
       try {
         await fs.unlink(portfolio.customThumbnail);
       } catch (err) {
-        console.log('Thumbnail not found:', err.message);
+        console.log('Local thumbnail not found during deletion:', err.message);
       }
     }
 

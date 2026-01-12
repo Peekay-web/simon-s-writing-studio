@@ -43,8 +43,8 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log('✅ SQLite database connected successfully');
 
-    // Only sync in development or if explicitly requested
-    if (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_SYNC === 'true') {
+    // Always sync in production (Render /tmp is ephemeral) or if explicitly requested
+    if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development' || process.env.FORCE_DB_SYNC === 'true') {
       await sequelize.sync({ alter: true });
       console.log('📊 Database models synchronized');
     }

@@ -1,6 +1,9 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const auth = require('../middleware/auth');
+const Testimonial = require('../models/Testimonial');
+const { sequelize } = require('../config/database');
+const { Op } = require('sequelize');
 
 const router = express.Router();
 
@@ -10,48 +13,51 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 10, rating } = req.query;
-    
-    let testimonials = global.inMemoryStorage.testimonials.filter(t => t.isApproved);
-    
+
+    const where = { isApproved: true };
     if (rating) {
-      testimonials = testimonials.filter(t => t.rating === parseInt(rating));
+      where.rating = parseInt(rating);
     }
 
-    // Sort by creation date (newest first)
-    testimonials.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    // Pagination
     const offset = (page - 1) * limit;
-    const paginatedTestimonials = testimonials.slice(offset, offset + parseInt(limit));
+
+    const { count, rows: testimonials } = await Testimonial.findAndCountAll({
+      where,
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
 
     // Calculate stats
-    const totalReviews = testimonials.length;
-    const averageRating = totalReviews > 0 
-      ? testimonials.reduce((sum, t) => sum + t.rating, 0) / totalReviews 
-      : 0;
+    const statsResult = await Testimonial.findAll({
+      where: { isApproved: true },
+      attributes: [
+        [sequelize.fn('AVG', sequelize.col('rating')), 'avgRating'],
+        [sequelize.fn('COUNT', sequelize.col('id')), 'totalCount']
+      ],
+      raw: true
+    });
+
+    const countsByRating = await Testimonial.findAll({
+      where: { isApproved: true },
+      attributes: ['rating', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
+      group: ['rating'],
+      raw: true
+    });
 
     const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    testimonials.forEach(t => {
-      distribution[t.rating]++;
+    countsByRating.forEach(c => {
+      distribution[c.rating] = c.count;
     });
 
     res.json({
-      testimonials: paginatedTestimonials.map(t => ({
-        id: t.id,
-        name: t.name,
-        status: t.status,
-        career: t.career,
-        rating: t.rating,
-        statement: t.statement,
-        projectType: t.projectType,
-        createdAt: t.createdAt
-      })),
-      totalPages: Math.ceil(testimonials.length / limit),
+      testimonials,
+      totalPages: Math.ceil(count / limit),
       currentPage: parseInt(page),
-      total: testimonials.length,
+      total: count,
       stats: {
-        averageRating: Math.round(averageRating * 10) / 10,
-        totalReviews,
+        averageRating: statsResult[0]?.avgRating ? Math.round(statsResult[0].avgRating * 10) / 10 : 0,
+        totalReviews: count,
         distribution
       }
     });
@@ -83,18 +89,22 @@ router.post('/', [
 
     // Check for duplicate submissions (same email within 24 hours)
     const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const existingTestimonial = global.inMemoryStorage.testimonials.find(t => 
-      t.email === email && new Date(t.createdAt) > dayAgo
-    );
+    const existingTestimonial = await Testimonial.findOne({
+      where: {
+        email,
+        createdAt: {
+          [Op.gt]: dayAgo
+        }
+      }
+    });
 
     if (existingTestimonial) {
-      return res.status(429).json({ 
-        message: 'You can only submit one testimonial per day' 
+      return res.status(429).json({
+        message: 'You can only submit one testimonial per day'
       });
     }
 
-    const testimonial = {
-      id: Date.now(),
+    const testimonial = await Testimonial.create({
       name,
       email,
       status,
@@ -103,25 +113,13 @@ router.post('/', [
       statement,
       projectType,
       isApproved: true, // Auto-approve for simplicity
-      createdAt: new Date().toISOString(),
       ipAddress: req.ip,
       userAgent: req.get('User-Agent')
-    };
+    });
 
-    global.inMemoryStorage.testimonials.push(testimonial);
-
-    res.status(201).json({ 
+    res.status(201).json({
       message: 'Testimonial submitted successfully! Thank you for your feedback.',
-      testimonial: {
-        id: testimonial.id,
-        name: testimonial.name,
-        status: testimonial.status,
-        career: testimonial.career,
-        rating: testimonial.rating,
-        statement: testimonial.statement,
-        projectType: testimonial.projectType,
-        createdAt: testimonial.createdAt
-      }
+      testimonial
     });
   } catch (error) {
     console.error(error);
@@ -135,18 +133,20 @@ router.post('/', [
 router.get('/pending', auth, async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
-
-    const pendingTestimonials = global.inMemoryStorage.testimonials.filter(t => !t.isApproved);
-    
-    // Pagination
     const offset = (page - 1) * limit;
-    const paginatedTestimonials = pendingTestimonials.slice(offset, offset + parseInt(limit));
+
+    const { count, rows: testimonials } = await Testimonial.findAndCountAll({
+      where: { isApproved: false },
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
 
     res.json({
-      testimonials: paginatedTestimonials,
-      totalPages: Math.ceil(pendingTestimonials.length / limit),
+      testimonials,
+      totalPages: Math.ceil(count / limit),
       currentPage: parseInt(page),
-      total: pendingTestimonials.length
+      total: count
     });
   } catch (error) {
     console.error(error);
@@ -159,14 +159,16 @@ router.get('/pending', auth, async (req, res) => {
 // @access  Private
 router.put('/:id/approve', auth, async (req, res) => {
   try {
-    const testimonial = global.inMemoryStorage.testimonials.find(t => t.id === parseInt(req.params.id));
-    
+    const testimonial = await Testimonial.findByPk(req.params.id);
+
     if (!testimonial) {
       return res.status(404).json({ message: 'Testimonial not found' });
     }
 
-    testimonial.isApproved = true;
-    testimonial.approvedAt = new Date().toISOString();
+    await testimonial.update({
+      isApproved: true,
+      approvedAt: new Date()
+    });
 
     res.json({ message: 'Testimonial approved successfully', testimonial });
   } catch (error) {
@@ -180,13 +182,13 @@ router.put('/:id/approve', auth, async (req, res) => {
 // @access  Private
 router.delete('/:id', auth, async (req, res) => {
   try {
-    const index = global.inMemoryStorage.testimonials.findIndex(t => t.id === parseInt(req.params.id));
-    
-    if (index === -1) {
+    const testimonial = await Testimonial.findByPk(req.params.id);
+
+    if (!testimonial) {
       return res.status(404).json({ message: 'Testimonial not found' });
     }
 
-    global.inMemoryStorage.testimonials.splice(index, 1);
+    await testimonial.destroy();
     res.json({ message: 'Testimonial deleted successfully' });
   } catch (error) {
     console.error(error);
