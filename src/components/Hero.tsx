@@ -12,7 +12,7 @@ const Hero = () => {
               Welcome to my portfolio
             </p>
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Hon. Chukwuemeka Samuel PK Simon
+              Hon. Chukwuemeka PK Samuel Simon
             </h1>
             <p className="text-lg md:text-xl text-primary font-medium animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Research Writer • Consultant • Freelancer
@@ -42,7 +42,7 @@ const Hero = () => {
               <div className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden shadow-xl border-4 border-primary/20 bg-secondary transition-transform duration-300 group-hover:scale-[1.02]">
                 <img 
                   src="/WhatsApp Image 2026-01-08 at 21.27.25.jpeg" 
-                  alt="Hon. Chukwuemeka Samuel PK Simon - Professional Research Writer" 
+                  alt="Hon. Chukwuemeka PK Samuel Simon - Professional Research Writer" 
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   onLoad={() => {
                     console.log('Profile image loaded successfully');
