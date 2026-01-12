@@ -128,7 +128,7 @@ const Portfolio = () => {
                 {portfolios.map((project, index) => (
                   <Card
                     key={project.id}
-                    className={`group overflow-hidden hover:border-primary/50 hover:shadow-2xl transition-all duration-500 bg-background/50 backdrop-blur-sm ${gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                    className={`group overflow-hidden border-2 hover:border-primary/50 hover:shadow-2xl transition-all duration-500 bg-card backdrop-blur-sm ${gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
                       }`}
                     style={{ transitionDelay: `${index * 100}ms` }}
                   >
