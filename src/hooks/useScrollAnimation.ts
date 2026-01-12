@@ -15,6 +15,19 @@ export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
     const element = ref.current;
     if (!element) return;
 
+    // Check if element is already in viewport on mount
+    const rect = element.getBoundingClientRect();
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+    const isInViewport = rect.top <= windowHeight && rect.bottom >= 0;
+    
+    if (isInViewport) {
+      // Small delay to ensure animation plays
+      requestAnimationFrame(() => {
+        setIsVisible(true);
+      });
+      if (triggerOnce) return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

@@ -1,5 +1,4 @@
 import { Linkedin, Twitter, Facebook, Instagram } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const socialLinks = [
   { icon: Linkedin, href: "#", label: "LinkedIn" },
@@ -12,6 +11,7 @@ const quickLinks = [
   { href: "#about", label: "About" },
   { href: "#services", label: "Services" },
   { href: "#portfolio", label: "Portfolio" },
+  { href: "#blog", label: "Blog" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -25,10 +25,10 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <h3 className="font-display text-xl font-bold mb-3 text-primary-foreground">
-              Hon. Chukwuemeka Samuel PK Simon
+              Hon. Chukwuemeka PK Samuel Simon
             </h3>
             <p className="text-background/70 leading-relaxed mb-4 text-sm">
-              Professional Research Writer, Consultant, and Freelancer dedicated to
+              Professional Research Writer, Consultant, and Freelancer dedicated to 
               helping you achieve your academic and professional goals.
             </p>
             <div className="flex gap-3">
@@ -52,8 +52,8 @@ const Footer = () => {
             <h4 className="font-display text-base font-semibold mb-3 text-primary-foreground">Contact Info</h4>
             <ul className="space-y-2 text-background/70 text-sm">
               <li>
-                <a
-                  href="mailto:chukwuemekasimon@yahoo.com"
+                <a 
+                  href="mailto:chukwuemekasimon@yahoo.com" 
                   className="hover:text-primary transition-colors duration-200 break-all"
                 >
                   chukwuemekasimon@yahoo.com
@@ -72,14 +72,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="border-t border-background/20 pt-6 text-center">
           <p className="text-background/60 text-xs">
-            © {currentYear} Hon. Chukwuemeka Samuel PK Simon. All rights reserved.{' '}
-            <Link
-              to="/admin/login"
-              className="text-background/60 hover:text-primary transition-colors ml-2 font-medium"
-              style={{ textDecoration: 'none' }}
-            >
-              Admin
-            </Link>
+            © {currentYear} Hon. Chukwuemeka PK Samuel Simon. All rights reserved.
           </p>
         </div>
       </div>
