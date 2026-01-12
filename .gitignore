@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local Environment & Data
+.env
+.env.*
+server/.env
+server/database.sqlite
+server/check_upload.cjs
+uploads/
+server/uploads/
