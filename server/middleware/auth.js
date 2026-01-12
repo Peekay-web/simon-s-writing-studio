@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 module.exports = async (req, res, next) => {
   try {
@@ -12,8 +13,8 @@ module.exports = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
     
-    // Get user from in-memory storage
-    const user = global.inMemoryStorage.users.find(u => u.id === decoded.user.id);
+    // Get user from database
+    const user = await User.findByPk(decoded.user.id);
     
     if (!user) {
       return res.status(401).json({ message: 'Token is not valid' });
@@ -22,8 +23,7 @@ module.exports = async (req, res, next) => {
     // Add user to request
     req.user = {
       id: user.id,
-      name: user.name,
-      email: user.email,
+      username: user.username,
       role: user.role
     };
 

@@ -76,6 +76,7 @@ class FileConverter {
   // Convert PDF to images
   static async convertPdfToImages(filePath) {
     try {
+      // Check if pdf-poppler is available
       const pdf2pic = require('pdf-poppler');
       const outputDir = path.join('uploads', 'converted', path.basename(filePath, path.extname(filePath)));
       await this.ensureDir(outputDir);
@@ -103,7 +104,8 @@ class FileConverter {
       return images;
     } catch (error) {
       console.error('PDF to Image conversion error:', error);
-      throw new Error(`PDF conversion failed: ${error.message}`);
+      // If pdf-poppler fails, return null to indicate we should use raw PDF
+      throw new Error('PDF_CONVERSION_NOT_AVAILABLE');
     }
   }
 
@@ -195,10 +197,22 @@ class FileConverter {
           break;
 
         case 'pdf':
-          result = {
-            type: 'pdf',
-            data: await this.convertPdfToImages(filePath)
-          };
+          try {
+            result = {
+              type: 'pdf',
+              data: await this.convertPdfToImages(filePath)
+            };
+          } catch (error) {
+            if (error.message === 'PDF_CONVERSION_NOT_AVAILABLE') {
+              // Return a special type indicating raw PDF should be used
+              result = {
+                type: 'pdf-raw',
+                data: null
+              };
+            } else {
+              throw error;
+            }
+          }
           break;
 
         default:

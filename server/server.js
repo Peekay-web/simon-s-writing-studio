@@ -35,6 +35,28 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Debug UI (development only)
+if (process.env.NODE_ENV === 'development') {
+  app.get('/debug', (req, res) => {
+    res.sendFile(path.join(__dirname, 'debug.html'));
+  });
+  
+  // Debug route to inspect portfolio data
+  app.get('/debug/portfolio/:id', async (req, res) => {
+    try {
+      const Portfolio = require('./models/Portfolio');
+      const portfolio = await Portfolio.findByPk(req.params.id);
+      res.json({
+        portfolio: portfolio ? portfolio.toJSON() : null,
+        fileInfo: portfolio?.file || null,
+        fileType: portfolio?.file ? require('./services/fileConverter').getFileType(portfolio.file.originalName || portfolio.file.filename || 'unknown') : null
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+}
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));

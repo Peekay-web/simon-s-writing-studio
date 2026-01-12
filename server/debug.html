@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Debug UI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .result { background: #f5f5f5; padding: 10px; margin: 10px 0; white-space: pre-wrap; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+    <h1>Backend Debug UI</h1>
+    
+    <div class="section">
+        <h2>1. Test Server Connection</h2>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <div id="health-result" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h2>2. List All Portfolios</h2>
+        <button onclick="listPortfolios()">Get All Portfolios</button>
+        <div id="portfolios-result" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h2>3. Test Portfolio View</h2>
+        <input type="number" id="portfolio-id" placeholder="Portfolio ID" value="1">
+        <button onclick="testPortfolioView()">Test Portfolio View</button>
+        <div id="view-result" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h2>4. Inspect Portfolio Data</h2>
+        <input type="number" id="inspect-portfolio-id" placeholder="Portfolio ID" value="1">
+        <button onclick="inspectPortfolio()">Inspect Portfolio</button>
+        <div id="inspect-result" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h2>5. Test Direct File Access</h2>
+        <input type="number" id="file-portfolio-id" placeholder="Portfolio ID" value="1">
+        <button onclick="testDirectFile()">Test Direct File</button>
+        <div id="file-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001';
+
+        async function makeRequest(url, method = 'GET') {
+            try {
+                const response = await fetch(API_BASE + url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                return {
+                    status: response.status,
+                    ok: response.ok,
+                    data
+                };
+            } catch (error) {
+                return {
+                    status: 0,
+                    ok: false,
+                    error: error.message
+                };
+            }
+        }
+
+        async function testHealth() {
+            const result = await makeRequest('/api/health');
+            const resultDiv = document.getElementById('health-result');
+            
+            if (result.ok) {
+                resultDiv.className = 'result success';
+                resultDiv.textContent = 'SUCCESS: ' + JSON.stringify(result.data, null, 2);
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'ERROR: ' + (result.error || JSON.stringify(result.data, null, 2));
+            }
+        }
+
+        async function listPortfolios() {
+            const result = await makeRequest('/api/portfolio');
+            const resultDiv = document.getElementById('portfolios-result');
+            
+            if (result.ok) {
+                resultDiv.className = 'result success';
+                resultDiv.textContent = JSON.stringify(result.data, null, 2);
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'ERROR: ' + (result.error || JSON.stringify(result.data, null, 2));
+            }
+        }
+
+        async function testPortfolioView() {
+            const id = document.getElementById('portfolio-id').value;
+            const result = await makeRequest(`/api/portfolio/${id}/view`);
+            const resultDiv = document.getElementById('view-result');
+            
+            if (result.ok) {
+                resultDiv.className = 'result success';
+                resultDiv.textContent = JSON.stringify(result.data, null, 2);
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `ERROR (${result.status}): ` + (result.error || JSON.stringify(result.data, null, 2));
+            }
+        }
+
+        async function inspectPortfolio() {
+            const id = document.getElementById('inspect-portfolio-id').value;
+            const result = await makeRequest(`/debug/portfolio/${id}`);
+            const resultDiv = document.getElementById('inspect-result');
+            
+            if (result.ok) {
+                resultDiv.className = 'result success';
+                resultDiv.textContent = JSON.stringify(result.data, null, 2);
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `ERROR (${result.status}): ` + (result.error || JSON.stringify(result.data, null, 2));
+            }
+        }
+
+        async function testDirectFile() {
+            const id = document.getElementById('file-portfolio-id').value;
+            const url = `${API_BASE}/api/portfolio/${id}/file`;
+            const resultDiv = document.getElementById('file-result');
+            
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `SUCCESS: File accessible<br>
+                        Content-Type: ${response.headers.get('content-type')}<br>
+                        <a href="${url}" target="_blank">Open File</a>`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `ERROR (${response.status}): ${response.statusText}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'ERROR: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

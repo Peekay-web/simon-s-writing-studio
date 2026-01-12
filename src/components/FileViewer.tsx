@@ -166,6 +166,9 @@ const FileViewer: React.FC<FileViewerProps> = ({ portfolioId, title }) => {
 
   // Native PDF View Fallback (If conversion fails / system lacks Poppler)
   if (viewData.fileType === 'pdf-raw') {
+    // Check if URL is already a full URL (Cloudinary) or relative path
+    const pdfUrl = viewData.url.startsWith('http') ? viewData.url : `${API_BASE_URL}${viewData.url}`;
+    
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -173,7 +176,7 @@ const FileViewer: React.FC<FileViewerProps> = ({ portfolioId, title }) => {
             PDF VIEWER (NATIVE)
           </Badge>
           <a
-            href={`${API_BASE_URL}${viewData.url}`}
+            href={pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-primary hover:underline flex items-center font-medium"
@@ -183,7 +186,7 @@ const FileViewer: React.FC<FileViewerProps> = ({ portfolioId, title }) => {
         </div>
         <div className="rounded-xl overflow-hidden border bg-muted shadow-inner h-[70vh]">
           <iframe
-            src={`${API_BASE_URL}${viewData.url}#toolbar=0`}
+            src={`${pdfUrl}#toolbar=0`}
             className="w-full h-full border-none"
             title={title}
           />

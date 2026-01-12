@@ -138,35 +138,47 @@ router.get('/:id/view', async (req, res) => {
     }
 
     const fileInfo = portfolio.file;
+    console.log('=== PORTFOLIO VIEW DEBUG ===');
+    console.log('Portfolio ID:', req.params.id);
+    console.log('File info:', JSON.stringify(fileInfo, null, 2));
+    
+    // Get file extension from originalName or filename
+    const fileName = fileInfo.originalName || fileInfo.filename || '';
+    const fileExtension = fileName.toLowerCase().split('.').pop();
+    
+    console.log('File name:', fileName);
+    console.log('File extension:', fileExtension);
+    
+    // FORCE PDF HANDLING - If it's a PDF, serve directly
+    if (fileExtension === 'pdf') {
+      console.log('🔴 DETECTED PDF - SERVING DIRECTLY');
+      const pdfUrl = fileInfo.url || `/api/portfolio/${portfolio.id}/file`;
+      
+      return res.json({
+        fileType: 'pdf-raw',
+        originalName: fileName,
+        url: pdfUrl
+      });
+    }
+    
+    // For non-PDF files, try conversion
+    console.log('📄 NON-PDF FILE - ATTEMPTING CONVERSION');
     const fileSource = fileInfo.url || (fileInfo.path ? path.join(__dirname, '..', fileInfo.path) : null);
-    const fileType = FileConverter.getFileType(fileInfo.originalName || fileInfo.filename || 'unknown');
 
     if (!fileSource) {
       return res.status(404).json({ message: 'File source not found' });
     }
 
-    // If it's a PDF and they want the actual PDF file, they can use another route
-    // But here we want the rich preview data
-
     try {
       const convertedData = await FileConverter.convertFile(fileSource);
+      
       res.json({
         fileType: convertedData.type,
-        originalName: portfolio.file.originalName,
+        originalName: fileName,
         data: convertedData.data
       });
     } catch (conversionError) {
       console.error('File conversion error:', conversionError);
-
-      // Fallback: If it's a PDF, we tell the frontend to use the raw file in an iframe
-      if (fileType === 'pdf') {
-        return res.json({
-          fileType: 'pdf-raw',
-          originalName: portfolio.file.originalName,
-          url: `/api/portfolio/${portfolio.id}/file`
-        });
-      }
-
       res.status(500).json({ message: 'Conversion failed', error: conversionError.message });
     }
   } catch (error) {
