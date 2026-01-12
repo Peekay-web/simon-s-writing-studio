@@ -3,6 +3,7 @@ import { Loader2, FileText, Download, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import axios from '@/lib/axios';
 
 interface FileViewerProps {
   portfolioId: string;
@@ -30,26 +31,24 @@ const FileViewer: React.FC<FileViewerProps> = ({ portfolioId, fileName, fileType
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/portfolio/${portfolioId}/view`);
+      const response = await axios.get(`/api/portfolio/${portfolioId}/view`, {
+        responseType: 'blob'
+      });
       
-      if (!response.ok) {
-        throw new Error('Failed to load file');
-      }
-
-      const contentType = response.headers.get('content-type');
+      const contentType = response.headers['content-type'];
       
       // Handle PDF files
       if (contentType?.includes('application/pdf')) {
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
+        const url = URL.createObjectURL(response.data);
         setFileData({
           fileType: 'pdf',
           originalName: fileName,
           data: { url }
         });
       } else {
-        // Handle converted Office files
-        const data = await response.json();
+        // Handle converted Office files (JSON response)
+        const text = await response.data.text();
+        const data = JSON.parse(text);
         setFileData(data);
       }
     } catch (err) {

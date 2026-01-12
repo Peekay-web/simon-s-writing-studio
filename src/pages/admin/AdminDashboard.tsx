@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FileText, 
-  MessageSquare, 
-  Eye, 
+import {
+  FileText,
+  MessageSquare,
+  Eye,
   TrendingUp,
   Users,
   Calendar,
@@ -23,7 +23,7 @@ interface DashboardStats {
 }
 
 interface RecentTestimonial {
-  _id: string;
+  id: string;
   name: string;
   rating: number;
   review: string;
@@ -32,7 +32,7 @@ interface RecentTestimonial {
 }
 
 interface TopPortfolio {
-  _id: string;
+  id: string;
   title: string;
   views: number;
   category: string;
@@ -53,7 +53,7 @@ const AdminDashboard = () => {
     try {
       const response = await axios.get('/api/admin/dashboard');
       const data = response.data;
-      
+
       setStats(data.stats);
       setRecentTestimonials(data.latestTestimonials || []);
       setTopPortfolios(data.topPortfolios || []);
@@ -149,7 +149,7 @@ const AdminDashboard = () => {
                   </p>
                 ) : (
                   recentTestimonials.map((testimonial) => (
-                    <div key={testimonial._id} className="border-b pb-4 last:border-b-0">
+                    <div key={testimonial.id} className="border-b pb-4 last:border-b-0">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
@@ -158,11 +158,10 @@ const AdminDashboard = () => {
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`h-3 w-3 ${
-                                    i < testimonial.rating
+                                  className={`h-3 w-3 ${i < testimonial.rating
                                       ? 'text-yellow-400 fill-current'
                                       : 'text-gray-300'
-                                  }`}
+                                    }`}
                                 />
                               ))}
                             </div>
@@ -201,7 +200,7 @@ const AdminDashboard = () => {
                   </p>
                 ) : (
                   topPortfolios.map((portfolio, index) => (
-                    <div key={portfolio._id} className="flex items-center space-x-3">
+                    <div key={portfolio.id} className="flex items-center space-x-3">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                         <span className="text-sm font-medium text-primary">
                           {index + 1}

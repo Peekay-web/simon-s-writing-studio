@@ -6,6 +6,7 @@ require('dotenv').config();
 
 // Initialize database
 require('./config/database');
+require('./models'); // Load models and associations
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -67,21 +68,6 @@ const inMemoryStorage = {
       createdAt: new Date().toISOString()
     }
   ],
-  blogs: [
-    {
-      id: 1,
-      title: 'The Art of Academic Writing',
-      slug: 'art-of-academic-writing',
-      excerpt: 'Discover the key principles that make academic writing effective and engaging.',
-      content: '<p>Academic writing requires precision, clarity, and rigorous research...</p>',
-      category: 'academic',
-      isPublished: true,
-      views: 156,
-      authorId: 1,
-      createdAt: new Date().toISOString(),
-      publishedAt: new Date().toISOString()
-    }
-  ],
   analytics: []
 };
 
@@ -118,7 +104,6 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/portfolio', require('./routes/portfolio'));
 app.use('/api/testimonials', require('./routes/testimonials'));
-app.use('/api/blog', require('./routes/blog'));
 app.use('/api/analytics', require('./routes/analytics'));
 
 // Health check

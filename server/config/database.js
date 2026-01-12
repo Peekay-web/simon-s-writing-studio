@@ -45,7 +45,7 @@ const connectDB = async () => {
 
     // Only sync in development or if explicitly requested
     if (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_SYNC === 'true') {
-      await sequelize.sync({ alter: false });
+      await sequelize.sync({ alter: true });
       console.log('📊 Database models synchronized');
     }
 

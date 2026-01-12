@@ -111,11 +111,10 @@ const Testimonials = () => {
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`w-5 h-5 ${
-              star <= rating 
-                ? 'fill-yellow-400 text-yellow-400' 
+            className={`w-5 h-5 ${star <= rating
+                ? 'fill-yellow-400 text-yellow-400'
                 : 'text-gray-300'
-            } ${interactive ? 'cursor-pointer hover:text-yellow-400' : ''}`}
+              } ${interactive ? 'cursor-pointer hover:text-yellow-400' : ''}`}
             onClick={interactive && onRatingChange ? () => onRatingChange(star) : undefined}
           />
         ))}
@@ -126,7 +125,7 @@ const Testimonials = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <main className="pt-20">
         {/* Header Section */}
         <section className="py-16 lg:py-24">
@@ -170,7 +169,7 @@ const Testimonials = () => {
                     Add Your Testimonial
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Share Your Experience</DialogTitle>
                   </DialogHeader>
@@ -184,7 +183,7 @@ const Testimonials = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="email">Email</Label>
                       <Input
@@ -220,15 +219,15 @@ const Testimonials = () => {
 
                     <div>
                       <Label>Rating</Label>
-                      {renderStars(formData.rating, true, (rating) => 
+                      {renderStars(formData.rating, true, (rating) =>
                         setFormData({ ...formData, rating })
                       )}
                     </div>
 
                     <div>
                       <Label htmlFor="projectType">Project Type</Label>
-                      <Select 
-                        value={formData.projectType} 
+                      <Select
+                        value={formData.projectType}
                         onValueChange={(value) => setFormData({ ...formData, projectType: value })}
                       >
                         <SelectTrigger>
@@ -283,15 +282,15 @@ const Testimonials = () => {
                     <Card key={testimonial.id} className="relative">
                       <CardContent className="pt-8 pb-6">
                         <Quote className="w-8 h-8 text-muted-foreground/30 absolute top-6 left-6" />
-                        
+
                         <div className="pl-8 mb-4">
                           {renderStars(testimonial.rating)}
                         </div>
-                        
+
                         <p className="text-muted-foreground leading-relaxed mb-6 pl-8">
                           "{testimonial.statement}"
                         </p>
-                        
+
                         <div className="flex items-center gap-4 pl-8">
                           <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
                             <span className="font-display font-semibold text-foreground">
@@ -304,7 +303,7 @@ const Testimonials = () => {
                             <p className="text-xs text-muted-foreground">{testimonial.career}</p>
                           </div>
                         </div>
-                        
+
                         <div className="mt-4 pl-8">
                           <span className="inline-block px-2 py-1 bg-secondary text-xs rounded-full capitalize">
                             {testimonial.projectType}

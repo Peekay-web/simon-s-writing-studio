@@ -1,4 +1,5 @@
 import { Linkedin, Twitter, Facebook, Instagram } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const socialLinks = [
   { icon: Linkedin, href: "#", label: "LinkedIn" },
@@ -11,7 +12,6 @@ const quickLinks = [
   { href: "#about", label: "About" },
   { href: "#services", label: "Services" },
   { href: "#portfolio", label: "Portfolio" },
-  { href: "#blog", label: "Blog" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -73,13 +73,13 @@ const Footer = () => {
         <div className="border-t border-background/20 pt-6 text-center">
           <p className="text-background/60 text-xs">
             © {currentYear} Hon. Chukwuemeka Samuel PK Simon. All rights reserved.{' '}
-            <a
-              href="/admin/login"
-              className="text-background/60 hover:text-background/80 transition-colors"
+            <Link
+              to="/admin/login"
+              className="text-background/60 hover:text-primary transition-colors ml-2 font-medium"
               style={{ textDecoration: 'none' }}
             >
               Admin
-            </a>
+            </Link>
           </p>
         </div>
       </div>

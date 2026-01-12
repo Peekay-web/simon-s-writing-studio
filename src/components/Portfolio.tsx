@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import axios, { API_BASE_URL } from "@/lib/axios";
 
 interface PortfolioItem {
-  _id: string;
+  id: string | number;
   title: string;
   description: string;
   category: string;
@@ -46,9 +47,10 @@ const Portfolio = () => {
   const fetchPortfolios = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/portfolio?category=${selectedCategory}&limit=12`);
-      const data = await response.json();
-      setPortfolios(data.portfolios || []);
+      const params = new URLSearchParams({ limit: '12' });
+      if (selectedCategory !== 'all') params.append('category', selectedCategory);
+      const response = await axios.get(`/api/portfolio?${params}`);
+      setPortfolios(response.data.portfolios || []);
     } catch (error) {
       console.error('Failed to fetch portfolios:', error);
     } finally {
@@ -121,113 +123,115 @@ const Portfolio = () => {
           ))}
         </div>
 
-        {portfolios.length === 0 ? (
-          <div className="text-center py-12">
-            <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground">No projects found in this category.</p>
-          </div>
-        ) : (
-          <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {portfolios.map((project, index) => (
-              <Card
-                key={project._id}
-                className={`group overflow-hidden hover:border-primary/50 hover:shadow-lg transition-all duration-500 ${gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-                  }`}
-                style={{ transitionDelay: `${index * 80}ms` }}
-              >
-                {/* Project Thumbnail */}
-                <div className="h-48 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border-b border-border relative overflow-hidden">
-                  {project.customThumbnail || project.thumbnail ? (
-                    <img
-                      src={project.customThumbnail || project.thumbnail}
-                      alt={project.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <div className="w-16 h-16 mx-auto rounded-full bg-primary/20 flex items-center justify-center mb-2 border-2 border-primary/30">
-                        <FileText className="h-8 w-8 text-primary" />
+        <div ref={gridRef}>
+          {portfolios.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">No projects found in this category.</p>
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {portfolios.map((project, index) => (
+                <Card
+                  key={project.id}
+                  className={`group overflow-hidden hover:border-primary/50 hover:shadow-lg transition-all duration-500 ${gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                    }`}
+                  style={{ transitionDelay: `${index * 80}ms` }}
+                >
+                  {/* Project Thumbnail */}
+                  <div className="h-48 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border-b border-border relative overflow-hidden">
+                    {project.customThumbnail || project.thumbnail ? (
+                      <img
+                        src={`${API_BASE_URL}/${project.customThumbnail || project.thumbnail}`}
+                        alt={project.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto rounded-full bg-primary/20 flex items-center justify-center mb-2 border-2 border-primary/30">
+                          <FileText className="h-8 w-8 text-primary" />
+                        </div>
+                        <p className="text-xs text-primary font-medium">Document Preview</p>
                       </div>
-                      <p className="text-xs text-primary font-medium">Document Preview</p>
+                    )}
+                    <div className="absolute top-2 right-2">
+                      <Badge className={getCategoryColor(project.category)}>
+                        {project.category}
+                      </Badge>
                     </div>
-                  )}
-                  <div className="absolute top-2 right-2">
-                    <Badge className={getCategoryColor(project.category)}>
-                      {project.category}
-                    </Badge>
                   </div>
-                </div>
 
-                <CardHeader className="pb-3">
-                  <CardTitle className="font-display text-lg group-hover:text-primary transition-colors">
-                    {project.title}
-                  </CardTitle>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{project.views} views</span>
-                    <span>{new Date(project.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="pt-0">
-                  <CardDescription className="text-muted-foreground leading-relaxed mb-4 text-sm">
-                    {project.description}
-                  </CardDescription>
-
-                  {/* Tags */}
-                  {project.tags && project.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {project.tags.slice(0, 3).map((tag, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {project.tags.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{project.tags.length - 3}
-                        </Badge>
-                      )}
+                  <CardHeader className="pb-3">
+                    <CardTitle className="font-display text-lg group-hover:text-primary transition-colors">
+                      {project.title}
+                    </CardTitle>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{project.views} views</span>
+                      <span>{new Date(project.createdAt).toLocaleDateString()}</span>
                     </div>
-                  )}
+                  </CardHeader>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                        onClick={() => setSelectedPortfolio(project)}
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        View Project
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle className="font-display text-xl">
-                          {selectedPortfolio?.title}
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="p-6">
-                        <p className="text-muted-foreground mb-4">
-                          {selectedPortfolio?.description}
-                        </p>
-                        {selectedPortfolio?.tags && selectedPortfolio.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {selectedPortfolio.tags.map((tag, idx) => (
-                              <Badge key={idx} variant="secondary">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
+                  <CardContent className="pt-0">
+                    <CardDescription className="text-muted-foreground leading-relaxed mb-4 text-sm">
+                      {project.description}
+                    </CardDescription>
+
+                    {/* Tags */}
+                    {project.tags && project.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-4">
+                        {project.tags.slice(0, 3).map((tag, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                        {project.tags.length > 3 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{project.tags.length - 3}
+                          </Badge>
                         )}
                       </div>
-                    </DialogContent>
-                  </Dialog>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                    )}
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                          onClick={() => setSelectedPortfolio(project)}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Project
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle className="font-display text-xl">
+                            {selectedPortfolio?.title}
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="p-6">
+                          <p className="text-muted-foreground mb-4">
+                            {selectedPortfolio?.description}
+                          </p>
+                          {selectedPortfolio?.tags && selectedPortfolio.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {selectedPortfolio.tags.map((tag, idx) => (
+                                <Badge key={idx} variant="secondary">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

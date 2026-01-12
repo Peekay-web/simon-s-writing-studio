@@ -11,10 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/admin/AdminLayout';
-import axios from '@/lib/axios';
+import axios, { API_BASE_URL } from '@/lib/axios';
 
 interface PortfolioItem {
-  id: string; // Changed from _id to id to match Sequelize
+  id: string | number; // Changed from _id to id to match Sequelize
   title: string;
   description: string;
   category: string;
@@ -163,7 +163,7 @@ const AdminPortfolio = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string | number) => {
     if (!confirm('Are you sure you want to delete this item? This cannot be undone.')) return;
 
     try {
@@ -388,7 +388,7 @@ const AdminPortfolio = () => {
                 <div className="h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center border-b">
                   {item.customThumbnail ? (
                     <img
-                      src={`/${item.customThumbnail}`} // Assuming path is relative to public or root
+                      src={`${API_BASE_URL}/${item.customThumbnail}`}
                       alt={item.title}
                       className="w-full h-full object-cover"
                     />

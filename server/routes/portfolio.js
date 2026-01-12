@@ -1,12 +1,12 @@
 const express = require('express');
 const multer = require('multer');
-const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs').promises;
 const Portfolio = require('../models/Portfolio');
 const Analytics = require('../models/Analytics');
 const FileConverter = require('../services/fileConverter');
 const auth = require('../middleware/auth');
+const { Op } = require('sequelize');
 
 const router = express.Router();
 
@@ -14,8 +14,12 @@ const router = express.Router();
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     const uploadPath = 'uploads/portfolio';
-    await fs.mkdir(uploadPath, { recursive: true });
-    cb(null, uploadPath);
+    try {
+      await fs.mkdir(uploadPath, { recursive: true });
+      cb(null, uploadPath);
+    } catch (err) {
+      cb(err);
+    }
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -47,25 +51,27 @@ const upload = multer({
 router.get('/', async (req, res) => {
   try {
     const { category, page = 1, limit = 10 } = req.query;
-    
-    const query = { isPublished: true };
+
+    const where = { isPublished: true };
     if (category && category !== 'all') {
-      query.category = category;
+      where.category = category;
     }
 
-    const portfolios = await Portfolio.find(query)
-      .sort({ order: 1, createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .select('-file.path'); // Don't expose file paths to public
+    const offset = (page - 1) * limit;
 
-    const total = await Portfolio.countDocuments(query);
+    const { count, rows: portfolios } = await Portfolio.findAndCountAll({
+      where,
+      order: [['order', 'ASC'], ['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      attributes: { exclude: ['file'] } // Don't expose file paths to public
+    });
 
     res.json({
       portfolios,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-      total
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+      total: count
     });
   } catch (error) {
     console.error(error);
@@ -78,33 +84,34 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/:id', async (req, res) => {
   try {
-    const portfolio = await Portfolio.findById(req.params.id);
-    
+    const portfolio = await Portfolio.findByPk(req.params.id);
+
     if (!portfolio || !portfolio.isPublished) {
       return res.status(404).json({ message: 'Portfolio item not found' });
     }
 
     // Increment views
-    portfolio.views += 1;
-    await portfolio.save();
+    await portfolio.increment('views');
 
     // Track analytics
-    const analytics = new Analytics({
+    await Analytics.create({
       type: 'portfolio_view',
-      page: `/portfolio/${portfolio._id}`,
-      portfolioId: portfolio._id,
+      page: `/portfolio/${portfolio.id}`,
+      portfolioId: portfolio.id,
       ipAddress: req.ip,
       userAgent: req.get('User-Agent'),
       referrer: req.get('Referer'),
       sessionId: req.sessionID || 'anonymous'
     });
-    await analytics.save();
 
     // Return portfolio without file path for security
-    const { file, ...portfolioData } = portfolio.toObject();
+    const portfolioData = portfolio.toJSON();
+    const hasFile = !!portfolioData.file;
+    delete portfolioData.file;
+
     res.json({
       ...portfolioData,
-      hasFile: !!file
+      hasFile
     });
   } catch (error) {
     console.error(error);
@@ -117,8 +124,8 @@ router.get('/:id', async (req, res) => {
 // @access  Public
 router.get('/:id/view', async (req, res) => {
   try {
-    const portfolio = await Portfolio.findById(req.params.id);
-    
+    const portfolio = await Portfolio.findByPk(req.params.id);
+
     if (!portfolio || !portfolio.isPublished || !portfolio.file) {
       return res.status(404).json({ message: 'File not found' });
     }
@@ -160,14 +167,14 @@ router.get('/:id/view', async (req, res) => {
 // @access  Private
 router.get('/:id/download', auth, async (req, res) => {
   try {
-    const portfolio = await Portfolio.findById(req.params.id);
-    
+    const portfolio = await Portfolio.findByPk(req.params.id);
+
     if (!portfolio || !portfolio.file) {
       return res.status(404).json({ message: 'File not found' });
     }
 
     const filePath = path.join(__dirname, '..', portfolio.file.path);
-    
+
     res.setHeader('Content-Type', portfolio.file.mimetype);
     res.setHeader('Content-Disposition', `attachment; filename="${portfolio.file.originalName}"`);
     res.sendFile(filePath);
@@ -196,7 +203,7 @@ router.post('/', auth, upload.fields([
     };
 
     // Handle main file upload
-    if (req.files.file) {
+    if (req.files && req.files.file) {
       const file = req.files.file[0];
       portfolioData.file = {
         originalName: file.originalname,
@@ -208,7 +215,7 @@ router.post('/', auth, upload.fields([
     }
 
     // Handle custom thumbnail
-    if (req.files.thumbnail) {
+    if (req.files && req.files.thumbnail) {
       const thumbnail = req.files.thumbnail[0];
       portfolioData.customThumbnail = thumbnail.path;
     }
@@ -217,8 +224,12 @@ router.post('/', auth, upload.fields([
       portfolioData.publishedAt = new Date();
     }
 
-    const portfolio = new Portfolio(portfolioData);
-    await portfolio.save();
+    // Set authorId if available in request (from auth middleware)
+    if (req.user && req.user.id) {
+      portfolioData.authorId = req.user.id;
+    }
+
+    const portfolio = await Portfolio.create(portfolioData);
 
     res.status(201).json(portfolio);
   } catch (error) {
@@ -235,8 +246,8 @@ router.put('/:id', auth, upload.fields([
   { name: 'thumbnail', maxCount: 1 }
 ]), async (req, res) => {
   try {
-    const portfolio = await Portfolio.findById(req.params.id);
-    
+    const portfolio = await Portfolio.findByPk(req.params.id);
+
     if (!portfolio) {
       return res.status(404).json({ message: 'Portfolio item not found' });
     }
@@ -248,19 +259,19 @@ router.put('/:id', auth, upload.fields([
     if (description) portfolio.description = description;
     if (category) portfolio.category = category;
     if (tags) portfolio.tags = JSON.parse(tags);
-    
+
     // Handle publishing status
     if (isPublished !== undefined) {
       const wasPublished = portfolio.isPublished;
       portfolio.isPublished = isPublished === 'true';
-      
+
       if (!wasPublished && portfolio.isPublished) {
         portfolio.publishedAt = new Date();
       }
     }
 
     // Handle file updates
-    if (req.files.file) {
+    if (req.files && req.files.file) {
       // Delete old file if exists
       if (portfolio.file && portfolio.file.path) {
         try {
@@ -281,7 +292,7 @@ router.put('/:id', auth, upload.fields([
     }
 
     // Handle thumbnail updates
-    if (req.files.thumbnail) {
+    if (req.files && req.files.thumbnail) {
       // Delete old thumbnail if exists
       if (portfolio.customThumbnail) {
         try {
@@ -307,8 +318,8 @@ router.put('/:id', auth, upload.fields([
 // @access  Private
 router.delete('/:id', auth, async (req, res) => {
   try {
-    const portfolio = await Portfolio.findById(req.params.id);
-    
+    const portfolio = await Portfolio.findByPk(req.params.id);
+
     if (!portfolio) {
       return res.status(404).json({ message: 'Portfolio item not found' });
     }
@@ -330,7 +341,7 @@ router.delete('/:id', auth, async (req, res) => {
       }
     }
 
-    await Portfolio.findByIdAndDelete(req.params.id);
+    await portfolio.destroy();
     res.json({ message: 'Portfolio item deleted successfully' });
   } catch (error) {
     console.error(error);

@@ -7,7 +7,6 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/testimonials", label: "Testimonials" },
-  { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -19,9 +18,9 @@ const Navbar = () => {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-14">
           <a href="#" className="font-display text-xl font-semibold text-primary hover:text-primary/80 transition-colors duration-200 flex items-center">
-            <img 
-              src="/favicon.svg" 
-              alt="PK Koncepts Logo" 
+            <img
+              src="/favicon.svg"
+              alt="PK Koncepts Logo"
               className="w-8 h-8 mr-2 transition-transform duration-200 hover:scale-105"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
