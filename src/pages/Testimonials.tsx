@@ -112,8 +112,8 @@ const Testimonials = () => {
           <Star
             key={star}
             className={`w-5 h-5 ${star <= rating
-                ? 'fill-yellow-400 text-yellow-400'
-                : 'text-gray-300'
+              ? 'fill-yellow-400 text-yellow-400'
+              : 'text-gray-300'
               } ${interactive ? 'cursor-pointer hover:text-yellow-400' : ''}`}
             onClick={interactive && onRatingChange ? () => onRatingChange(star) : undefined}
           />
@@ -169,11 +169,11 @@ const Testimonials = () => {
                     Add Your Testimonial
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Share Your Experience</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={handleSubmit} className="space-y-3">
                     <div>
                       <Label htmlFor="name">Full Name</Label>
                       <Input
@@ -251,7 +251,7 @@ const Testimonials = () => {
                         placeholder="Share your experience working with us..."
                         value={formData.statement}
                         onChange={(e) => setFormData({ ...formData, statement: e.target.value })}
-                        rows={4}
+                        rows={3}
                         required
                       />
                     </div>
